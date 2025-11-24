@@ -1,8 +1,8 @@
 import { BaseLayout } from '@/components/layouts/base-layout';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useId, useRef, useEffect } from 'react';
 import {
     Home,
     FileText,
@@ -14,8 +14,8 @@ import {
     BarChart3,
     Settings,
     Star,
-    ChevronRight,
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const Dashboard3 = () => {
     const {
@@ -25,154 +25,225 @@ const Dashboard3 = () => {
     } = useSelector((state: any) => state.auth || {});
     const firstName = user?.name?.split(' ')[0] || 'User';
     const role = user?.role || 'employee';
+    const [active, setActive] = useState<any>(null);
+    const id = useId();
+    const ref = useRef<HTMLDivElement>(null);
 
     const modules = [
         {
-            name: 'Dashboard',
-            icon: <Home className="w-4 h-4" />,
+            title: 'Dashboard',
+            description: 'Your central hub',
+            icon: <Home className="w-8 h-8" />,
             path: '/dashboard',
             favorite: true,
+            color: 'bg-blue-500',
         },
         {
-            name: 'Sales',
-            icon: <FileText className="w-4 h-4" />,
+            title: 'Sales',
+            description: 'Manage orders & customers',
+            icon: <FileText className="w-8 h-8" />,
             path: '/modules/sales',
             favorite: true,
+            color: 'bg-green-500',
         },
         {
-            name: 'Inventory',
-            icon: <Package className="w-4 h-4" />,
+            title: 'Inventory',
+            description: 'Track stock levels',
+            icon: <Package className="w-8 h-8" />,
             path: '/modules/inventory',
             favorite: true,
+            color: 'bg-purple-500',
         },
-        { name: 'Finance', icon: <DollarSign className="w-4 h-4" />, path: '/modules/finance' },
-        { name: 'HR & Payroll', icon: <Users className="w-4 h-4" />, path: '/modules/hr' },
         {
-            name: 'Procurement',
-            icon: <ShoppingCart className="w-4 h-4" />,
+            title: 'Finance',
+            description: 'Accounting & reports',
+            icon: <DollarSign className="w-8 h-8" />,
+            path: '/modules/finance',
+            favorite: false,
+            color: 'bg-yellow-500',
+        },
+        {
+            title: 'HR & Payroll',
+            description: 'Employee management',
+            icon: <Users className="w-8 h-8" />,
+            path: '/modules/hr',
+            favorite: false,
+            color: 'bg-pink-500',
+        },
+        {
+            title: 'Procurement',
+            description: 'Purchase orders',
+            icon: <ShoppingCart className="w-8 h-8" />,
             path: '/modules/procurement',
+            favorite: false,
+            color: 'bg-indigo-500',
         },
         {
-            name: 'Manufacturing',
-            icon: <Factory className="w-4 h-4" />,
+            title: 'Manufacturing',
+            description: 'Production workflows',
+            icon: <Factory className="w-8 h-8" />,
             path: '/modules/manufacturing',
+            favorite: false,
+            color: 'bg-red-500',
         },
-        { name: 'Analytics', icon: <BarChart3 className="w-4 h-4" />, path: '/modules/analytics' },
+        {
+            title: 'Analytics',
+            description: 'Business insights',
+            icon: <BarChart3 className="w-8 h-8" />,
+            path: '/modules/analytics',
+            favorite: false,
+            color: 'bg-teal-500',
+        },
         ...(role === 'admin'
-            ? [{ name: 'System Admin', icon: <Settings className="w-4 h-4" />, path: '/admin' }]
+            ? [
+                  {
+                      title: 'System Admin',
+                      description: 'User roles & permissions',
+                      icon: <Settings className="w-8 h-8" />,
+                      path: '/admin',
+                      favorite: false,
+                      color: 'bg-gray-600',
+                  },
+              ]
             : []),
     ];
 
-    const favorites = modules.filter((m) => m.favorite);
+    useEffect(() => {
+        const onKeyDown = (e: KeyboardEvent) => e.key === 'Escape' && setActive(null);
+        if (active) document.body.style.overflow = 'hidden';
+        else document.body.style.overflow = 'auto';
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+    }, [active]);
 
     return (
         <BaseLayout title="Dashboard3" description="Welcome to your admin dashboard">
-            <div className="p-6 space-y-8">
-                {/* Welcome Header */}
-                <div className="space-y-1">
-                    <h1 className="text-3xl font-bold tracking-tight">
+            <div className="p-6 space-y-12">
+                {/* Header */}
+                <div className="text-center space-y-2">
+                    <h1 className="text-4xl font-bold tracking-tight">
                         Welcome back, {firstName}!
                     </h1>
-                    <p className="text-muted-foreground">
-                        Managing <span className="font-medium">{company}</span> • {department}
+                    <p className="text-lg text-muted-foreground">
+                        Managing <span className="font-semibold">{company}</span> • {department}
                     </p>
                 </div>
 
-                {/* Quick Stats */}
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                    <Card>
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Company
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{company}</div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Department
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{department}</div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Role
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold capitalize">
-                                {role.replace('_manager', '').replace('_', ' ')}
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Favorites
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{favorites.length}</div>
-                            <p className="text-xs text-muted-foreground">Quick access modules</p>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                {/* Favorites Section */}
-                <div className="space-y-4">
-                    <div className="flex items-center gap-2">
-                        <Star className="w-5 h-5 text-yellow-500 fill-current" />
-                        <h2 className="text-xl font-semibold">Your Favorite Modules</h2>
-                    </div>
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                        {favorites.map((mod) => (
-                            <Button
-                                key={mod.name}
-                                asChild
-                                variant="outline"
-                                className="h-24 justify-start text-left font-normal hover:bg-accent hover:text-accent-foreground transition-all"
+                {/* Expandable Cards Grid */}
+                <div className="max-w-7xl mx-auto">
+                    <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {modules.map((card) => (
+                            <motion.div
+                                layoutId={`card-${card.title}-${id}`}
+                                key={card.title}
+                                onClick={() => setActive(card)}
+                                className="group relative cursor-pointer"
                             >
-                                <Link to={mod.path} className="flex flex-col gap-3">
-                                    <div className="flex items-center gap-3">
-                                        {mod.icon}
-                                        <span className="font-medium">{mod.name}</span>
+                                <motion.div className="p-8 rounded-2xl bg-card border shadow-sm hover:shadow-xl transition-all duration-300 group-hover:scale-[1.02]">
+                                    <div
+                                        className={`w-20 h-20 ${card.color} rounded-2xl flex items-center justify-center text-white mb-6`}
+                                    >
+                                        {card.icon}
                                     </div>
-                                    <ChevronRight className="w-4 h-4 ml-auto text-muted-foreground" />
-                                </Link>
-                            </Button>
+                                    <motion.h3
+                                        layoutId={`title-${card.title}-${id}`}
+                                        className="text-xl font-semibold text-foreground"
+                                    >
+                                        {card.title}
+                                    </motion.h3>
+                                    <motion.p
+                                        layoutId={`desc-${card.title}-${id}`}
+                                        className="text-muted-foreground mt-2"
+                                    >
+                                        {card.description}
+                                    </motion.p>
+                                    {card.favorite && (
+                                        <Star className="absolute top-4 right-4 w-5 h-5 text-yellow-500 fill-current" />
+                                    )}
+                                </motion.div>
+                            </motion.div>
                         ))}
-                    </div>
+                    </ul>
                 </div>
 
-                {/* All Modules */}
-                <div className="space-y-4">
-                    <h2 className="text-xl font-semibold">All Available Modules</h2>
-                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                        {modules.map((mod) => (
-                            <Button
-                                key={mod.name}
-                                asChild
-                                variant="ghost"
-                                className="justify-start h-auto py-3 px-4 text-left font-normal hover:bg-accent/50"
-                            >
-                                <Link to={mod.path} className="flex items-center gap-3 w-full">
-                                    {mod.icon}
-                                    <span>{mod.name}</span>
-                                    {mod.favorite && (
-                                        <Star className="w-3.5 h-3.5 ml-auto text-yellow-500 fill-current" />
-                                    )}
-                                </Link>
-                            </Button>
-                        ))}
-                    </div>
-                </div>
+                {/* Expanded Card Modal */}
+                <AnimatePresence>
+                    {active && (
+                        <>
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="fixed inset-0 bg-black/50 z-40"
+                                onClick={() => setActive(null)}
+                            />
+                            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                                <motion.div
+                                    layoutId={`card-${active.title}-${id}`}
+                                    ref={ref}
+                                    className="max-w-2xl w-full bg-card rounded-3xl shadow-2xl overflow-hidden"
+                                >
+                                    <motion.div
+                                        className={`h-64 ${active.color} flex items-center justify-center text-white`}
+                                    >
+                                        {active.icon}
+                                    </motion.div>
+
+                                    <div className="p-8 space-y-6">
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <motion.h3
+                                                    layoutId={`title-${active.title}-${id}`}
+                                                    className="text-3xl font-bold"
+                                                >
+                                                    {active.title}
+                                                </motion.h3>
+                                                <motion.p
+                                                    layoutId={`desc-${active.title}-${id}`}
+                                                    className="text-lg text-muted-foreground mt-2"
+                                                >
+                                                    {active.description}
+                                                </motion.p>
+                                            </div>
+                                            {active.favorite && (
+                                                <Star className="w-8 h-8 text-yellow-500 fill-current" />
+                                            )}
+                                        </div>
+
+                                        <div className="space-y-4 text-muted-foreground">
+                                            <p>
+                                                This module gives you full access to{' '}
+                                                <strong>{active.title}</strong> features.
+                                                {role === 'admin' && active.title === 'System Admin'
+                                                    ? ' You have elevated privileges to manage users, roles, and system settings.'
+                                                    : ' Navigate through the sidebar or use the favorites section for quick access.'}
+                                            </p>
+                                            <p className="text-sm">
+                                                Last accessed:{' '}
+                                                <span className="font-medium">
+                                                    Today at 2:34 PM
+                                                </span>
+                                            </p>
+                                        </div>
+
+                                        <div className="flex gap-4 pt-4">
+                                            <Button asChild size="lg" className="flex-1">
+                                                <Link to={active.path}>Open Module</Link>
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                size="lg"
+                                                onClick={() => setActive(null)}
+                                            >
+                                                Close
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            </div>
+                        </>
+                    )}
+                </AnimatePresence>
             </div>
         </BaseLayout>
     );
