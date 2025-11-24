@@ -110,7 +110,13 @@ export function LoginForm2({ className, ...props }: React.ComponentProps<'form'>
     };
 
     return (
-        <form className={cn('flex flex-col gap-6 max-w-md mx-auto', className)} {...props}>
+        <form
+            className={cn(
+                'flex flex-col gap-6 max-w-md w-full bg-white dark:bg-gray-800 p-8 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700',
+                className
+            )}
+            {...props}
+        >
             {/* Header */}
             <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Login to your account</h1>
