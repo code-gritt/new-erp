@@ -1,3 +1,4 @@
+import { ProtectedRoute } from '@/components/router/ProtectedRoute';
 import { lazy } from 'react';
 import { Navigate } from 'react-router-dom';
 
@@ -71,7 +72,11 @@ export const routes: RouteConfig[] = [
     },
     {
         path: '/dashboard-3',
-        element: <Dashboard3 />,
+        element: (
+            <ProtectedRoute>
+                <Dashboard3 />
+            </ProtectedRoute>
+        ),
     },
 
     // Application Routes
