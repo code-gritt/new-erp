@@ -1,17 +1,20 @@
+'use client';
+
 import { BaseLayout } from '@/components/layouts/base-layout';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useId, useRef, useEffect } from 'react';
+import { useState, useId, useEffect } from 'react';
 import {
     FileText,
-    Package,
     DollarSign,
     ShoppingCart,
+    Package,
     Factory,
     BarChart3,
     Settings,
     Star,
+    Users,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FloatingDock } from '@/components/ui/floating-dock';
@@ -24,6 +27,18 @@ import {
     IconFileText,
     IconTrash,
 } from '@tabler/icons-react';
+
+type UserRole = 'admin' | 'sales_manager' | 'hr_manager' | 'employee';
+
+interface Module {
+    title: string;
+    description: string;
+    icon: React.ReactNode;
+    path: string;
+    favorite: boolean;
+    color: string;
+    roles: UserRole[];
+}
 
 const dockItems = [
     {
@@ -63,13 +78,12 @@ const dockItems = [
     },
 ];
 
-const Dashboard3 = () => {
-    const { role = 'employee' } = useSelector((state: any) => state.auth || {});
-    const [active, setActive] = useState<any>(null);
+export default function Dashboard3() {
+    const { role = 'employee' } = useSelector((state: any) => state.auth?.user || {});
+    const [active, setActive] = useState<Module | null>(null);
     const id = useId();
-    const ref = useRef<HTMLDivElement>(null);
 
-    const modules = [
+    const modules: Module[] = [
         {
             title: 'General Ledger',
             description: 'Chart of accounts & journals',
@@ -77,6 +91,7 @@ const Dashboard3 = () => {
             path: '/modules/gl',
             favorite: true,
             color: 'bg-blue-500',
+            roles: ['admin', 'sales_manager', 'employee'],
         },
         {
             title: 'Account Receivables',
@@ -85,6 +100,7 @@ const Dashboard3 = () => {
             path: '/modules/ar',
             favorite: true,
             color: 'bg-green-500',
+            roles: ['admin', 'sales_manager'],
         },
         {
             title: 'Account Payables',
@@ -93,6 +109,7 @@ const Dashboard3 = () => {
             path: '/modules/ap',
             favorite: true,
             color: 'bg-purple-500',
+            roles: ['admin'],
         },
         {
             title: 'Cash Management',
@@ -101,6 +118,7 @@ const Dashboard3 = () => {
             path: '/modules/cash',
             favorite: false,
             color: 'bg-yellow-500',
+            roles: ['admin'],
         },
         {
             title: 'Sales',
@@ -109,6 +127,7 @@ const Dashboard3 = () => {
             path: '/modules/sales',
             favorite: true,
             color: 'bg-pink-500',
+            roles: ['admin', 'sales_manager'],
         },
         {
             title: 'Purchase',
@@ -117,6 +136,7 @@ const Dashboard3 = () => {
             path: '/modules/purchase',
             favorite: false,
             color: 'bg-indigo-500',
+            roles: ['admin'],
         },
         {
             title: 'Inventory',
@@ -125,6 +145,7 @@ const Dashboard3 = () => {
             path: '/modules/inventory',
             favorite: true,
             color: 'bg-red-500',
+            roles: ['admin', 'employee'],
         },
         {
             title: 'Fixed Assets',
@@ -133,6 +154,7 @@ const Dashboard3 = () => {
             path: '/modules/assets',
             favorite: false,
             color: 'bg-teal-500',
+            roles: ['admin'],
         },
         {
             title: 'Project Costing',
@@ -141,66 +163,72 @@ const Dashboard3 = () => {
             path: '/modules/projects',
             favorite: false,
             color: 'bg-orange-500',
+            roles: ['admin'],
         },
-        ...(role === 'admin'
-            ? [
-                  {
-                      title: 'System Admin',
-                      description: 'Users, roles & system settings',
-                      icon: <Settings className="w-8 h-8" />,
-                      path: '/admin',
-                      favorite: false,
-                      color: 'bg-gray-600',
-                  },
-              ]
-            : []),
+        {
+            title: 'Human Resources',
+            description: 'Employee records, payroll & leave',
+            icon: <Users className="w-8 h-8" />,
+            path: '/modules/hr',
+            favorite: true,
+            color: 'bg-cyan-500',
+            roles: ['admin', 'hr_manager'],
+        },
+        {
+            title: 'System Admin',
+            description: 'Users, roles, permissions & audit logs',
+            icon: <Settings className="w-8 h-8" />,
+            path: '/admin',
+            favorite: false,
+            color: 'bg-gray-600',
+            roles: ['admin'],
+        },
     ];
 
+    const visibleModules = modules.filter((module) => module.roles.includes(role as UserRole));
+
     useEffect(() => {
-        const onKeyDown = (e: KeyboardEvent) => e.key === 'Escape' && setActive(null);
+        const handleEsc = (e: KeyboardEvent) => e.key === 'Escape' && setActive(null);
         if (active) document.body.style.overflow = 'hidden';
         else document.body.style.overflow = 'auto';
-        window.addEventListener('keydown', onKeyDown);
-        return () => window.removeEventListener('keydown', onKeyDown);
+
+        window.addEventListener('keydown', handleEsc);
+        return () => window.removeEventListener('keydown', handleEsc);
     }, [active]);
 
     return (
         <BaseLayout title="" description="">
-            <div className="p-6 pt-12">
+            <div className="p-6 pt-12 min-h-screen">
                 <div className="max-w-7xl mx-auto">
-                    <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {modules.map((card) => (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {visibleModules.map((module) => (
                             <motion.div
-                                layoutId={`card-${card.title}-${id}`}
-                                key={card.title}
-                                onClick={() => setActive(card)}
+                                layoutId={`card-${module.title}-${id}`}
+                                key={module.title}
+                                onClick={() => setActive(module)}
                                 className="group relative cursor-pointer"
+                                whileHover={{ y: -4 }}
+                                whileTap={{ scale: 0.98 }}
                             >
-                                <motion.div className="p-8 rounded-2xl bg-card border shadow-sm hover:shadow-xl transition-all duration-300 group-hover:scale-[1.02]">
+                                <div className="p-8 rounded-2xl bg-card border shadow-sm hover:shadow-xl transition-all duration-300 group-hover:scale-[1.02]">
                                     <div
-                                        className={`w-20 h-20 ${card.color} rounded-2xl flex items-center justify-center text-white mb-6`}
+                                        className={`w-20 h-20 ${module.color} rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg`}
                                     >
-                                        {card.icon}
+                                        {module.icon}
                                     </div>
-                                    <motion.h3
-                                        layoutId={`title-${card.title}-${id}`}
-                                        className="text-xl font-semibold text-foreground"
-                                    >
-                                        {card.title}
-                                    </motion.h3>
-                                    <motion.p
-                                        layoutId={`desc-${card.title}-${id}`}
-                                        className="text-muted-foreground mt-2"
-                                    >
-                                        {card.description}
-                                    </motion.p>
-                                    {card.favorite && (
-                                        <Star className="absolute top-4 right-4 w-5 h-5 text-yellow-500 fill-current" />
+                                    <h3 className="text-xl font-semibold text-foreground">
+                                        {module.title}
+                                    </h3>
+                                    <p className="text-muted-foreground mt-2 text-sm">
+                                        {module.description}
+                                    </p>
+                                    {module.favorite && (
+                                        <Star className="absolute top-4 right-4 w-6 h-6 text-yellow-500 fill-current" />
                                     )}
-                                </motion.div>
+                                </div>
                             </motion.div>
                         ))}
-                    </ul>
+                    </div>
                 </div>
 
                 <AnimatePresence>
@@ -210,58 +238,53 @@ const Dashboard3 = () => {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
-                                className="fixed inset-0 bg-black/50 z-40"
+                                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
                                 onClick={() => setActive(null)}
                             />
-                            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
                                 <motion.div
                                     layoutId={`card-${active.title}-${id}`}
-                                    ref={ref}
                                     className="max-w-2xl w-full bg-card rounded-3xl shadow-2xl overflow-hidden"
                                 >
-                                    <motion.div
-                                        className={`h-64 ${active.color} flex items-center justify-center text-white`}
+                                    <div
+                                        className={`h-64 ${active.color} flex items-center justify-center`}
                                     >
-                                        {active.icon}
-                                    </motion.div>
+                                        <div className="scale-150 text-white opacity-90">
+                                            {active.icon}
+                                        </div>
+                                    </div>
 
                                     <div className="p-8 space-y-6">
                                         <div className="flex justify-between items-start">
                                             <div>
-                                                <motion.h3
-                                                    layoutId={`title-${active.title}-${id}`}
-                                                    className="text-3xl font-bold"
-                                                >
+                                                <h3 className="text-3xl font-bold text-foreground">
                                                     {active.title}
-                                                </motion.h3>
-                                                <motion.p
-                                                    layoutId={`desc-${active.title}-${id}`}
-                                                    className="text-lg text-muted-foreground mt-2"
-                                                >
+                                                </h3>
+                                                <p className="text-lg text-muted-foreground mt-2">
                                                     {active.description}
-                                                </motion.p>
+                                                </p>
                                             </div>
                                             {active.favorite && (
-                                                <Star className="w-8 h-8 text-yellow-500 fill-current" />
+                                                <Star className="w-10 h-10 text-yellow-500 fill-current" />
                                             )}
                                         </div>
 
-                                        <div className="space-y-4 text-muted-foreground">
-                                            <p>
-                                                This module gives you full access to{' '}
-                                                <strong>{active.title}</strong> features.
+                                        <div className="bg-muted/50 rounded-xl p-6 space-y-3">
+                                            <p className="text-sm text-muted-foreground">
+                                                This module is available to your role:{' '}
+                                                <span className="font-semibold capitalize">
+                                                    {role}
+                                                </span>
                                             </p>
                                             <p className="text-sm">
                                                 Last accessed:{' '}
-                                                <span className="font-medium">
-                                                    Today at 2:34 PM
-                                                </span>
+                                                <span className="font-medium">Today, 3:42 PM</span>
                                             </p>
                                         </div>
 
                                         <div className="flex gap-4 pt-4">
                                             <Button asChild size="lg" className="flex-1">
-                                                <Link to={active.path}>Open Module</Link>
+                                                <Link to={active.path}>Open {active.title}</Link>
                                             </Button>
                                             <Button
                                                 variant="outline"
@@ -277,7 +300,8 @@ const Dashboard3 = () => {
                         </>
                     )}
                 </AnimatePresence>
-                <div className="fixed inset-x-0 bottom-6 z-50 flex justify-center pointer-events-none">
+
+                <div className="fixed inset-x-0 bottom-6 z-40 flex justify-center pointer-events-none">
                     <div className="pointer-events-auto">
                         <FloatingDock items={dockItems} />
                     </div>
@@ -285,6 +309,4 @@ const Dashboard3 = () => {
             </div>
         </BaseLayout>
     );
-};
-
-export default Dashboard3;
+}
