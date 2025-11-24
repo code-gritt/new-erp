@@ -16,13 +16,7 @@ import {
 import { Button } from '@/components/ui/button';
 
 const Dashboard3 = () => {
-    const {
-        user,
-        company = 'Acme Corp',
-        department = 'Finance',
-    } = useSelector((state: any) => state.auth || {});
-    const firstName = user?.name?.split(' ')[0] || 'User';
-    const role = user?.role || 'employee';
+    const { user, role = 'employee' } = useSelector((state: any) => state.auth || {});
     const [active, setActive] = useState<any>(null);
     const id = useId();
     const ref = useRef<HTMLDivElement>(null);
@@ -123,17 +117,8 @@ const Dashboard3 = () => {
     }, [active]);
 
     return (
-        <BaseLayout title="Dashboard3" description="Welcome to your admin dashboard">
-            <div className="p-6 space-y-12">
-                <div className="text-center space-y-2">
-                    <h1 className="text-4xl font-bold tracking-tight">
-                        Welcome back, {firstName}!
-                    </h1>
-                    <p className="text-lg text-muted-foreground">
-                        Managing <span className="font-semibold">{company}</span> • {department}
-                    </p>
-                </div>
-
+        <BaseLayout title="Dashboard" description="ERP Home">
+            <div className="p-6 pt-12">
                 <div className="max-w-7xl mx-auto">
                     <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {modules.map((card) => (
@@ -217,9 +202,6 @@ const Dashboard3 = () => {
                                             <p>
                                                 This module gives you full access to{' '}
                                                 <strong>{active.title}</strong> features.
-                                                {role === 'admin' && active.title === 'System Admin'
-                                                    ? ' You have elevated privileges to manage users, roles, and system settings.'
-                                                    : ' Navigate through the sidebar or use the favorites section for quick access.'}
                                             </p>
                                             <p className="text-sm">
                                                 Last accessed:{' '}
