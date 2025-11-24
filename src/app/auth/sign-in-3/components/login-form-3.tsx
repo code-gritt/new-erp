@@ -38,6 +38,7 @@ export default function LoginForm3() {
     const navigate = useNavigate();
     const [step, setStep] = useState(1);
     const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
     const [company, setCompany] = useState('');
     const [department, setDepartment] = useState('');
     const [loading, setLoading] = useState(false);
@@ -98,7 +99,7 @@ export default function LoginForm3() {
                                     <h1 className="text-2xl font-bold">Welcome back</h1>
                                     <p className="text-muted-foreground text-balance">
                                         {step === 1
-                                            ? 'Enter your email or username'
+                                            ? 'Enter your email/username and password'
                                             : 'Select your company and department'}
                                     </p>
                                 </div>
@@ -115,10 +116,22 @@ export default function LoginForm3() {
                                                 autoFocus
                                             />
                                         </div>
+                                        <div className="grid gap-3">
+                                            <Label htmlFor="password">Password</Label>
+                                            <Input
+                                                id="password"
+                                                type="password"
+                                                placeholder="Enter your password"
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
+                                            />
+                                        </div>
                                         <Button
                                             className="w-full"
-                                            onClick={() => username.trim() && setStep(2)}
-                                            disabled={!username.trim()}
+                                            onClick={() =>
+                                                username.trim() && password.trim() && setStep(2)
+                                            }
+                                            disabled={!username.trim() || !password.trim()}
                                         >
                                             Continue
                                         </Button>
