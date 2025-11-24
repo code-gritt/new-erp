@@ -125,11 +125,11 @@ export default function LoginForm3() {
                                     </>
                                 ) : (
                                     <>
-                                        <div className="grid gap-4">
+                                        <div className="space-y-5">
                                             <div>
                                                 <Label>Company</Label>
                                                 <Select value={company} onValueChange={setCompany}>
-                                                    <SelectTrigger>
+                                                    <SelectTrigger className="w-full mt-2">
                                                         <SelectValue placeholder="Select company" />
                                                     </SelectTrigger>
                                                     <SelectContent>
@@ -149,8 +149,14 @@ export default function LoginForm3() {
                                                     onValueChange={setDepartment}
                                                     disabled={!company}
                                                 >
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Select department" />
+                                                    <SelectTrigger className="w-full mt-2">
+                                                        <SelectValue
+                                                            placeholder={
+                                                                company
+                                                                    ? 'Select department'
+                                                                    : 'Choose company first'
+                                                            }
+                                                        />
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         {departments.map((d) => (
@@ -161,23 +167,25 @@ export default function LoginForm3() {
                                                     </SelectContent>
                                                 </Select>
                                             </div>
-                                        </div>
 
-                                        <div className="flex gap-3">
-                                            <Button
-                                                variant="outline"
-                                                className="flex-1"
-                                                onClick={() => setStep(1)}
-                                            >
-                                                Back
-                                            </Button>
-                                            <Button
-                                                className="flex-1"
-                                                onClick={handleLogin}
-                                                disabled={!company || !department || loading}
-                                            >
-                                                {loading ? 'Signing in...' : 'Sign In'}
-                                            </Button>
+                                            <div className="flex gap-3 pt-4">
+                                                <Button
+                                                    variant="outline"
+                                                    size="lg"
+                                                    className="flex-1"
+                                                    onClick={() => setStep(1)}
+                                                >
+                                                    Back
+                                                </Button>
+                                                <Button
+                                                    size="lg"
+                                                    className="flex-1"
+                                                    onClick={handleLogin}
+                                                    disabled={!company || !department || loading}
+                                                >
+                                                    {loading ? 'Signing in...' : 'Sign In'}
+                                                </Button>
+                                            </div>
                                         </div>
                                     </>
                                 )}
