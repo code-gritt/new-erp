@@ -3,10 +3,10 @@
 import * as React from 'react';
 import { useSelector } from 'react-redux';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { CommandSearch } from '@/components/command-search';
+import { CommandSearch, SearchTrigger } from '@/components/command-search';
 import { ModeToggle } from '@/components/mode-toggle';
+import { NavUser } from './nav-user';
 
 export function SiteHeader() {
     const [searchOpen, setSearchOpen] = React.useState(false);
@@ -30,27 +30,32 @@ export function SiteHeader() {
 
     return (
         <>
-            <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
-                <div className="flex w-full items-center gap-1 px-4 py-3 lg:gap-2 lg:px-6">
-                    <SidebarTrigger className="-ml-1" />
-                    <Separator
-                        orientation="vertical"
-                        className="mx-2 data-[orientation=vertical]:h-4"
-                    />
+            <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+                <div className="flex w-full items-center gap-4 px-3 sm:px-4 lg:px-6">
+                    <SidebarTrigger className="-ml-1 size-8" />
 
-                    {/* Welcome Message — exactly like Fine Foods */}
-                    <div className="flex-1">
-                        <div className="text-sm font-medium">
-                            Welcome back,{' '}
-                            <span className="font-bold text-primary">{firstName}!</span>
+                    <div className="flex flex-1 items-center gap-3 min-w-0">
+                        <div className="hidden sm:block flex-1 min-w-0">
+                            <div className="text-sm font-medium truncate">
+                                Welcome back,{' '}
+                                <span className="font-bold text-primary">{firstName}!</span>
+                            </div>
+                            <div className="text-xs text-muted-foreground truncate">
+                                {company} • {department}
+                            </div>
                         </div>
-                        <div className="text-xs text-muted-foreground">
-                            Managing <span className="font-medium">{company}</span> • {department}
+
+                        <div className="sm:hidden text-sm font-semibold truncate">
+                            Hi, <span className="text-primary">{firstName}</span>
+                        </div>
+
+                        <div className="hidden sm:block shrink-0">
+                            <SearchTrigger onClick={() => setSearchOpen(true)} />
                         </div>
                     </div>
 
-                    <div className="ml-auto flex items-center gap-2">
-                        <div className="hidden sm:flex items-center gap-2">
+                    <div className="flex items-center gap-1">
+                        <div className="hidden lg:flex items-center gap-1">
                             <Button variant="ghost" size="sm" className="text-xs">
                                 User Logs
                             </Button>
@@ -70,13 +75,13 @@ export function SiteHeader() {
                                 Help?
                             </Button>
                         </div>
-                        <Button variant="ghost" size="sm" className="font-medium">
-                            Logout
-                        </Button>
+
                         <ModeToggle />
+                        <NavUser />
                     </div>
                 </div>
             </header>
+
             <CommandSearch open={searchOpen} onOpenChange={setSearchOpen} />
         </>
     );
