@@ -43,7 +43,7 @@ export default function ExpandableCardDemo() {
 
             <AnimatePresence>
                 {active && (
-                    <div className="fixed inset-0 grid place-items-center z-[100]">
+                    <div className="fixed inset-0 grid place-items-center z-100">
                         <motion.button
                             key={`button-${active.title}-${id}`}
                             layout

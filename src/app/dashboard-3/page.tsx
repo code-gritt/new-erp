@@ -16,7 +16,7 @@ import {
 import { Button } from '@/components/ui/button';
 
 const Dashboard3 = () => {
-    const { user, role = 'employee' } = useSelector((state: any) => state.auth || {});
+    const { role = 'employee' } = useSelector((state: any) => state.auth || {});
     const [active, setActive] = useState<any>(null);
     const id = useId();
     const ref = useRef<HTMLDivElement>(null);
