@@ -43,7 +43,7 @@ export function NavUser() {
     const handleLogout = () => {
         dispatch(logout());
         toast.success('Logged out successfully');
-        navigate('/auth/sign-in-3');
+        navigate('/auth/sign-in-2');
     };
 
     return (
