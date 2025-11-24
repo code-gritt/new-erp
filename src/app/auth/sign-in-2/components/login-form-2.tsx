@@ -19,6 +19,7 @@ import { z } from 'zod';
 import { Check, ChevronRight } from 'lucide-react';
 import type { AppDispatch } from '@/app/store';
 import { cn } from '@/lib/utils';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 const COMPANIES: Record<string, string[]> = {
     'Acme Corp': ['Finance', 'HR', 'Sales', 'IT', 'Operations'],
@@ -51,7 +52,7 @@ export function LoginForm2({ className, ...props }: React.ComponentProps<'form'>
     const [password, setPassword] = useState('');
     const [company, setCompany] = useState('');
     const [department, setDepartment] = useState('');
-    const [loading, setLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [errors, setErrors] = useState<{ username?: string; password?: string }>({});
 
     const departments = company ? COMPANIES[company] : [];
@@ -78,7 +79,8 @@ export function LoginForm2({ className, ...props }: React.ComponentProps<'form'>
     const handleLogin = async () => {
         if (!company || !department) return;
 
-        setLoading(true);
+        setIsLoading(true);
+
         const input = username.toLowerCase().trim();
         let foundEmail = null;
 
@@ -93,166 +95,206 @@ export function LoginForm2({ className, ...props }: React.ComponentProps<'form'>
             }
         }
 
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
         if (foundEmail) {
             try {
                 await dispatch(
                     login({ email: foundEmail, password: 'password', company, department })
                 ).unwrap();
-                toast.success('Login successful');
+
+                toast.success('Welcome back! Login successful', {
+                    duration: 4000,
+                    icon: 'Success',
+                });
                 navigate('/dashboard');
             } catch {
-                toast.error('Login failed');
+                toast.error('Login failed. Please try again.', {
+                    duration: 5000,
+                });
             }
         } else {
-            toast.error('User not found');
+            toast.error('User not found. Try "Sarah" or "admin@enterprise.com"', {
+                duration: 5000,
+            });
         }
-        setLoading(false);
+
+        setIsLoading(false);
     };
 
     return (
-        <form
-            className={cn(
-                'flex flex-col gap-6 max-w-md w-full bg-white dark:bg-gray-800 p-8 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700',
-                className
-            )}
-            {...props}
-        >
-            {/* Header */}
-            <div className="flex flex-col items-center gap-2 text-center">
-                <h1 className="text-2xl font-bold">Login to your account</h1>
-                <p className="text-muted-foreground text-sm text-balance">
-                    Enter your credentials to continue
-                </p>
-            </div>
-
-            {/* Stepper */}
-            <div className="flex items-center justify-center gap-6 mt-4 w-full">
-                <div className="flex flex-col items-center gap-1 flex-1">
-                    <div
-                        className={`flex w-10 h-10 items-center justify-center rounded-full font-medium transition-all duration-300 ${
-                            step >= 1
-                                ? 'bg-primary text-primary-foreground shadow-md ring-2 ring-primary/20'
-                                : 'bg-muted text-muted-foreground'
-                        }`}
-                    >
-                        {step > 1 ? <Check className="w-5 h-5" /> : '1'}
+        <>
+            {isLoading && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+                    <div className="flex flex-col items-center gap-6">
+                        <LoadingSpinner size="lg" />
+                        <p className="text-lg font-medium animate-pulse">Signing you in...</p>
                     </div>
-                    <p className="text-xs font-medium text-center">Credentials</p>
+                </div>
+            )}
+
+            <form
+                className={cn(
+                    'flex flex-col gap-6 max-w-md w-full bg-white dark:bg-gray-800 p-8 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700',
+                    className
+                )}
+                onSubmit={(e) => e.preventDefault()}
+                {...props}
+            >
+                <div className="flex flex-col items-center gap-2 text-center">
+                    <h1 className="text-2xl font-bold">Login to your account</h1>
+                    <p className="text-muted-foreground text-sm text-balance">
+                        Enter your credentials to continue
+                    </p>
                 </div>
 
-                <div
-                    className={`h-0.5 flex-1 transition-all duration-500 ${
-                        step >= 2 ? 'bg-primary' : 'bg-muted'
-                    }`}
-                />
+                <div className="flex items-center justify-center gap-6 mt-4 w-full">
+                    <div className="flex flex-col items-center gap-1 flex-1">
+                        <div
+                            className={cn(
+                                'flex w-10 h-10 items-center justify-center rounded-full font-medium transition-all duration-300',
+                                step >= 1
+                                    ? 'bg-primary text-primary-foreground shadow-md ring-2 ring-primary/20'
+                                    : 'bg-muted text-muted-foreground'
+                            )}
+                        >
+                            {step > 1 ? <Check className="w-5 h-5" /> : '1'}
+                        </div>
+                        <p className="text-xs font-medium text-center mt-1">Credentials</p>
+                    </div>
 
-                <div className="flex flex-col items-center gap-1 flex-1">
                     <div
-                        className={`flex w-10 h-10 items-center justify-center rounded-full font-medium transition-all duration-300 ${
-                            step >= 2
-                                ? 'bg-primary text-primary-foreground shadow-md ring-2 ring-primary/20'
-                                : 'bg-muted text-muted-foreground'
-                        }`}
-                    >
-                        2
+                        className={cn(
+                            'h-0.5 flex-1 transition-all duration-500',
+                            step >= 2 ? 'bg-primary' : 'bg-muted'
+                        )}
+                    />
+
+                    <div className="flex flex-col items-center gap-1 flex-1">
+                        <div
+                            className={cn(
+                                'flex w-10 h-10 items-center justify-center rounded-full font-medium transition-all duration-300',
+                                step >= 2
+                                    ? 'bg-primary text-primary-foreground shadow-md ring-2 ring-primary/20'
+                                    : 'bg-muted text-muted-foreground'
+                            )}
+                        >
+                            2
+                        </div>
+                        <p className="text-xs font-medium text-center mt-1">Company & Dept</p>
                     </div>
-                    <p className="text-xs font-medium text-center">Company & Department</p>
                 </div>
-            </div>
 
-            {/* Step Forms */}
-            {step === 1 ? (
-                <>
-                    <div className="grid gap-4">
-                        <Label htmlFor="username">Username / Email</Label>
-                        <Input
-                            id="username"
-                            placeholder="admin@enterprise.com or Sarah"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            autoFocus
-                        />
-                        {errors.username && (
-                            <p className="text-red-500 text-sm">{errors.username}</p>
-                        )}
-                    </div>
-
-                    <div className="grid gap-4">
-                        <Label htmlFor="password">Password</Label>
-                        <Input
-                            id="password"
-                            type="password"
-                            placeholder="Enter your password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                        {errors.password && (
-                            <p className="text-red-500 text-sm">{errors.password}</p>
-                        )}
-                    </div>
-
-                    <Button className="w-full mt-2" onClick={handleContinue}>
-                        Continue <ChevronRight className="ml-2 w-4 h-4" />
-                    </Button>
-                </>
-            ) : (
-                <>
-                    <div className="space-y-5">
-                        <div>
-                            <Label>Company</Label>
-                            <Select value={company} onValueChange={setCompany}>
-                                <SelectTrigger className="w-full mt-2">
-                                    <SelectValue placeholder="Select company" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {Object.keys(COMPANIES).map((c) => (
-                                        <SelectItem key={c} value={c}>
-                                            {c}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                {step === 1 ? (
+                    <>
+                        <div className="grid gap-4">
+                            <Label htmlFor="username">Username / Email</Label>
+                            <Input
+                                id="username"
+                                placeholder="admin@enterprise.com or Sarah"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                autoFocus
+                                disabled={isLoading}
+                            />
+                            {errors.username && (
+                                <p className="text-red-500 text-sm">{errors.username}</p>
+                            )}
                         </div>
 
-                        <div>
-                            <Label>Department</Label>
-                            <Select
-                                value={department}
-                                onValueChange={setDepartment}
-                                disabled={!company}
-                            >
-                                <SelectTrigger className="w-full mt-2">
-                                    <SelectValue
-                                        placeholder={
-                                            company ? 'Select department' : 'Choose company first'
-                                        }
-                                    />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {departments.map((d) => (
-                                        <SelectItem key={d} value={d}>
-                                            {d}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                        <div className="grid gap-4">
+                            <Label htmlFor="password">Password</Label>
+                            <Input
+                                id="password"
+                                type="password"
+                                placeholder="Enter your password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                disabled={isLoading}
+                            />
+                            {errors.password && (
+                                <p className="text-red-500 text-sm">{errors.password}</p>
+                            )}
                         </div>
 
-                        <div className="flex gap-3 pt-4">
-                            <Button variant="outline" className="flex-1" onClick={() => setStep(1)}>
-                                Back
-                            </Button>
-                            <Button
-                                className="flex-1"
-                                onClick={handleLogin}
-                                disabled={!company || !department || loading}
-                            >
-                                {loading ? 'Signing in...' : 'Sign In'}
-                            </Button>
+                        <Button
+                            className="w-full mt-2"
+                            onClick={handleContinue}
+                            disabled={isLoading}
+                        >
+                            Continue <ChevronRight className="ml-2 w-4 h-4" />
+                        </Button>
+                    </>
+                ) : (
+                    <>
+                        <div className="space-y-5">
+                            <div>
+                                <Label>Company</Label>
+                                <Select
+                                    value={company}
+                                    onValueChange={setCompany}
+                                    disabled={isLoading}
+                                >
+                                    <SelectTrigger className="w-full mt-2">
+                                        <SelectValue placeholder="Select company" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {Object.keys(COMPANIES).map((c) => (
+                                            <SelectItem key={c} value={c}>
+                                                {c}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div>
+                                <Label>Department</Label>
+                                <Select
+                                    value={department}
+                                    onValueChange={setDepartment}
+                                    disabled={!company || isLoading}
+                                >
+                                    <SelectTrigger className="w-full mt-2">
+                                        <SelectValue
+                                            placeholder={
+                                                company
+                                                    ? 'Select department'
+                                                    : 'Choose company first'
+                                            }
+                                        />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {departments.map((d) => (
+                                            <SelectItem key={d} value={d}>
+                                                {d}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="flex gap-3 pt-4">
+                                <Button
+                                    variant="outline"
+                                    className="flex-1"
+                                    onClick={() => setStep(1)}
+                                    disabled={isLoading}
+                                >
+                                    Back
+                                </Button>
+                                <Button
+                                    className="flex-1"
+                                    onClick={handleLogin}
+                                    disabled={!company || !department || isLoading}
+                                >
+                                    {isLoading ? 'Signing in...' : 'Sign In'}
+                                </Button>
+                            </div>
                         </div>
-                    </div>
-                </>
-            )}
-        </form>
+                    </>
+                )}
+            </form>
+        </>
     );
 }
