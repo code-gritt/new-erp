@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/select';
 import { z } from 'zod';
 import type { AppDispatch } from '@/app/store';
+import { Check, ChevronRight } from 'lucide-react';
 
 const COMPANIES: Record<string, string[]> = {
     'Acme Corp': ['Finance', 'HR', 'Sales', 'IT', 'Operations'],
@@ -34,7 +35,6 @@ const mockUsers = {
     'user@enterprise.com': { name: 'Emma Employee', role: 'employee' },
 };
 
-// Zod schema for validation
 const loginSchema = z.object({
     username: z.string().min(1, 'Username or email is required').max(50, 'Username too long'),
     password: z
@@ -111,33 +111,72 @@ export default function LoginForm3() {
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center p-4">
+        <div className="flex min-h-screen items-center justify-center p-4 bg-gray-50 dark:bg-gray-900">
             <div className="w-full max-w-4xl">
-                <Card className="overflow-hidden">
+                <Card className="overflow-hidden shadow-xl">
                     <CardContent className="grid p-0 md:grid-cols-2">
-                        <div className="p-6 md:p-8">
-                            <div className="flex flex-col gap-6">
-                                <div className="flex justify-center mb-2">
-                                    <a href="/" className="flex items-center gap-2 font-medium">
-                                        <div className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-md">
-                                            <Logo size={24} />
+                        <div className="p-8 md:p-12 flex flex-col gap-10">
+                            {/* Header + Stepper */}
+                            <div className="flex flex-col items-center gap-6">
+                                {/* Logo */}
+                                <a href="/" className="flex items-center gap-2 font-medium">
+                                    <div className="bg-primary text-primary-foreground flex w-10 h-10 items-center justify-center rounded-md">
+                                        <Logo size={24} />
+                                    </div>
+                                    <span className="text-2xl font-bold">Enterprise Portal</span>
+                                </a>
+
+                                {/* Welcome Text */}
+                                <h1 className="text-2xl font-bold text-center">Welcome back</h1>
+
+                                {/* Stepper */}
+                                <div className="flex items-center justify-center gap-6 mt-4 w-full max-w-sm">
+                                    {/* Step 1 */}
+                                    <div className="flex flex-col items-center gap-1 flex-1">
+                                        <div
+                                            className={`flex w-10 h-10 items-center justify-center rounded-full font-medium transition-all duration-300 ${
+                                                step >= 1
+                                                    ? 'bg-primary text-primary-foreground shadow-md ring-2 ring-primary/20'
+                                                    : 'bg-muted text-muted-foreground'
+                                            }`}
+                                        >
+                                            {step > 1 ? <Check className="w-5 h-5" /> : '1'}
                                         </div>
-                                        <span className="text-xl">Enterprise Portal</span>
-                                    </a>
-                                </div>
+                                        <p className="text-xs font-medium text-center">
+                                            Credentials
+                                        </p>
+                                    </div>
 
-                                <div className="flex flex-col items-center text-center">
-                                    <h1 className="text-2xl font-bold">Welcome back</h1>
-                                    <p className="text-muted-foreground text-balance">
-                                        {step === 1
-                                            ? 'Enter your email/username and password'
-                                            : 'Select your company and department'}
-                                    </p>
-                                </div>
+                                    {/* Connector */}
+                                    <div
+                                        className={`h-0.5 flex-1 transition-all duration-500 ${
+                                            step >= 2 ? 'bg-primary' : 'bg-muted'
+                                        }`}
+                                    />
 
+                                    {/* Step 2 */}
+                                    <div className="flex flex-col items-center gap-1 flex-1">
+                                        <div
+                                            className={`flex w-10 h-10 items-center justify-center rounded-full font-medium transition-all duration-300 ${
+                                                step >= 2
+                                                    ? 'bg-primary text-primary-foreground shadow-md ring-2 ring-primary/20'
+                                                    : 'bg-muted text-muted-foreground'
+                                            }`}
+                                        >
+                                            2
+                                        </div>
+                                        <p className="text-xs font-medium text-center">
+                                            Company & Department
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Form */}
+                            <div className="flex flex-col gap-6 w-full">
                                 {step === 1 ? (
                                     <>
-                                        <div className="grid gap-3">
+                                        <div className="grid gap-4">
                                             <Label htmlFor="username">Username / Email</Label>
                                             <Input
                                                 id="username"
@@ -153,7 +192,7 @@ export default function LoginForm3() {
                                             )}
                                         </div>
 
-                                        <div className="grid gap-3">
+                                        <div className="grid gap-4">
                                             <Label htmlFor="password">Password</Label>
                                             <Input
                                                 id="password"
@@ -169,8 +208,8 @@ export default function LoginForm3() {
                                             )}
                                         </div>
 
-                                        <Button className="w-full" onClick={handleContinue}>
-                                            Continue
+                                        <Button className="w-full mt-2" onClick={handleContinue}>
+                                            Continue <ChevronRight className="ml-2 w-4 h-4" />
                                         </Button>
                                     </>
                                 ) : (
@@ -242,6 +281,7 @@ export default function LoginForm3() {
                             </div>
                         </div>
 
+                        {/* Right side image */}
                         <div className="bg-muted relative hidden md:block">
                             <img
                                 src="https://ui.shadcn.com/placeholder.svg"
