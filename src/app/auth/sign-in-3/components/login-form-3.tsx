@@ -17,6 +17,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { z } from 'zod';
 import type { AppDispatch } from '@/app/store';
 
 const COMPANIES: Record<string, string[]> = {
@@ -33,6 +34,15 @@ const mockUsers = {
     'user@enterprise.com': { name: 'Emma Employee', role: 'employee' },
 };
 
+// Zod schema for validation
+const loginSchema = z.object({
+    username: z.string().min(1, 'Username or email is required').max(50, 'Username too long'),
+    password: z
+        .string()
+        .min(1, 'Password is required')
+        .min(6, 'Password must be at least 6 characters'),
+});
+
 export default function LoginForm3() {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
@@ -43,7 +53,28 @@ export default function LoginForm3() {
     const [department, setDepartment] = useState('');
     const [loading, setLoading] = useState(false);
 
+    const [errors, setErrors] = useState<{ username?: string; password?: string }>({});
+
     const departments = company ? COMPANIES[company] : [];
+
+    const validateStep1 = () => {
+        const result = loginSchema.safeParse({ username, password });
+        if (!result.success) {
+            const fieldErrors: typeof errors = {};
+            result.error.issues.forEach((err) => {
+                if (err.path[0] === 'username') fieldErrors.username = err.message;
+                if (err.path[0] === 'password') fieldErrors.password = err.message;
+            });
+            setErrors(fieldErrors);
+            return false;
+        }
+        setErrors({});
+        return true;
+    };
+
+    const handleContinue = () => {
+        if (validateStep1()) setStep(2);
+    };
 
     const handleLogin = async () => {
         if (!company || !department) return;
@@ -115,7 +146,13 @@ export default function LoginForm3() {
                                                 onChange={(e) => setUsername(e.target.value)}
                                                 autoFocus
                                             />
+                                            {errors.username && (
+                                                <p className="text-red-500 text-sm">
+                                                    {errors.username}
+                                                </p>
+                                            )}
                                         </div>
+
                                         <div className="grid gap-3">
                                             <Label htmlFor="password">Password</Label>
                                             <Input
@@ -125,14 +162,14 @@ export default function LoginForm3() {
                                                 value={password}
                                                 onChange={(e) => setPassword(e.target.value)}
                                             />
+                                            {errors.password && (
+                                                <p className="text-red-500 text-sm">
+                                                    {errors.password}
+                                                </p>
+                                            )}
                                         </div>
-                                        <Button
-                                            className="w-full"
-                                            onClick={() =>
-                                                username.trim() && password.trim() && setStep(2)
-                                            }
-                                            disabled={!username.trim() || !password.trim()}
-                                        >
+
+                                        <Button className="w-full" onClick={handleContinue}>
                                             Continue
                                         </Button>
                                     </>
