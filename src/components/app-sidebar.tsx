@@ -27,7 +27,6 @@ import {
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { Logo } from '@/components/logo';
-import { SidebarNotification } from '@/components/sidebar-notification';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
@@ -157,7 +156,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarContent>
 
             <SidebarFooter>
-                <SidebarNotification />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>
