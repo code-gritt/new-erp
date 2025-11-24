@@ -105,7 +105,6 @@ export function LoginForm2({ className, ...props }: React.ComponentProps<'form'>
 
                 toast.success('Welcome back! Login successful', {
                     duration: 4000,
-                    icon: 'Success',
                 });
                 navigate('/dashboard');
             } catch {
