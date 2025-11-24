@@ -14,6 +14,55 @@ import {
     Star,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { FloatingDock } from '@/components/ui/floating-dock';
+import {
+    IconHome,
+    IconUser,
+    IconSettings,
+    IconFolderOpen,
+    IconDownload,
+    IconFileText,
+    IconMusic,
+    IconTrash,
+} from '@tabler/icons-react';
+
+const dockItems = [
+    {
+        title: 'Dashboard',
+        icon: <IconHome className="h-full w-full text-neutral-500 dark:text-neutral-300" />,
+        href: '/dashboard',
+    },
+    {
+        title: 'Files',
+        icon: <IconFolderOpen className="h-full w-full text-neutral-500 dark:text-neutral-300" />,
+        href: '/files',
+    },
+    {
+        title: 'Downloads',
+        icon: <IconDownload className="h-full w-full text-neutral-500 dark:text-neutral-300" />,
+        href: '/downloads',
+    },
+    {
+        title: 'Documents',
+        icon: <IconFileText className="h-full w-full text-neutral-500 dark:text-neutral-300" />,
+        href: '/documents',
+    },
+    {
+        title: 'Trash',
+        icon: <IconTrash className="h-full w-full text-neutral-500 dark:text-neutral-300" />,
+        href: '/trash',
+    },
+    {
+        title: 'Profile',
+        icon: <IconUser className="h-full w-full text-neutral-500 dark:text-neutral-300" />,
+        href: '/profile',
+    },
+    {
+        title: 'Settings',
+        icon: <IconSettings className="h-full w-full text-neutral-500 dark:text-neutral-300" />,
+        href: '/settings',
+    },
+];
 
 const Dashboard3 = () => {
     const { role = 'employee' } = useSelector((state: any) => state.auth || {});
@@ -229,6 +278,11 @@ const Dashboard3 = () => {
                         </>
                     )}
                 </AnimatePresence>
+                <div className="fixed inset-x-0 bottom-6 z-50 flex justify-center pointer-events-none">
+                    <div className="pointer-events-auto">
+                        <FloatingDock items={dockItems} />
+                    </div>
+                </div>
             </div>
         </BaseLayout>
     );
