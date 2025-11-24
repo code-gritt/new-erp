@@ -23,12 +23,12 @@ import {
     LayoutTemplate,
     AlertTriangle,
     HelpCircle,
+    LogOut,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { Logo } from '@/components/logo';
 import { NavMain } from '@/components/nav-main';
-import { NavUser } from '@/components/nav-user';
 import {
     Sidebar,
     SidebarContent,
@@ -38,6 +38,9 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { Button } from './ui/button';
+import { toast } from 'sonner';
+import { logout } from '@/features/auth/authSlice';
 
 const demoNavGroups = [
     {
@@ -118,10 +121,18 @@ const getErpNavGroups = (role: string) => {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     const { user, isAuthenticated } = useSelector((state: any) => state.auth || {});
     const role = user?.role || 'employee';
 
     const navGroups = isAuthenticated ? getErpNavGroups(role) : demoNavGroups;
+
+    const handleLogout = () => {
+        dispatch(logout());
+        toast.success('Logged out successfully');
+        navigate('/auth/sign-in-2');
+    };
 
     return (
         <Sidebar {...props}>
@@ -156,7 +167,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarContent>
 
             <SidebarFooter>
-                <NavUser />
+                <Button onClick={handleLogout} variant="ghost" size="sm" className="gap-2">
+                    <LogOut className="h-4 w-4" />
+                    <span className="hidden sm:inline">Logout</span>
+                </Button>
             </SidebarFooter>
         </Sidebar>
     );

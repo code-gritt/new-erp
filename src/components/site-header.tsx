@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { CommandSearch, SearchTrigger } from '@/components/command-search';
 import { ModeToggle } from '@/components/mode-toggle';
-import { LogOut } from 'lucide-react';
+import { NavUser } from './nav-user';
 
 export function SiteHeader() {
     const [searchOpen, setSearchOpen] = React.useState(false);
@@ -49,7 +49,7 @@ export function SiteHeader() {
                             Hi, <span className="text-primary">{firstName}</span>
                         </div>
 
-                        <div className="shrink-0">
+                        <div className="hidden sm:block shrink-0">
                             <SearchTrigger onClick={() => setSearchOpen(true)} />
                         </div>
                     </div>
@@ -76,12 +76,8 @@ export function SiteHeader() {
                             </Button>
                         </div>
 
-                        <Button variant="ghost" size="sm" className="gap-2">
-                            <LogOut className="h-4 w-4" />
-                            <span className="hidden sm:inline">Logout</span>
-                        </Button>
-
                         <ModeToggle />
+                        <NavUser />
                     </div>
                 </div>
             </header>

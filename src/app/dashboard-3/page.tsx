@@ -22,7 +22,6 @@ import {
     IconFolderOpen,
     IconDownload,
     IconFileText,
-    IconMusic,
     IconTrash,
 } from '@tabler/icons-react';
 
