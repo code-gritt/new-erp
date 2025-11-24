@@ -4,11 +4,9 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useId, useRef, useEffect } from 'react';
 import {
-    Home,
     FileText,
     Package,
     DollarSign,
-    Users,
     ShoppingCart,
     Factory,
     BarChart3,
@@ -31,74 +29,82 @@ const Dashboard3 = () => {
 
     const modules = [
         {
-            title: 'Dashboard',
-            description: 'Your central hub',
-            icon: <Home className="w-8 h-8" />,
-            path: '/dashboard',
+            title: 'General Ledger',
+            description: 'Chart of accounts & journals',
+            icon: <FileText className="w-8 h-8" />,
+            path: '/modules/gl',
             favorite: true,
             color: 'bg-blue-500',
         },
         {
-            title: 'Sales',
-            description: 'Manage orders & customers',
-            icon: <FileText className="w-8 h-8" />,
-            path: '/modules/sales',
+            title: 'Account Receivables',
+            description: 'Customer invoices & receipts',
+            icon: <DollarSign className="w-8 h-8" />,
+            path: '/modules/ar',
             favorite: true,
             color: 'bg-green-500',
         },
         {
-            title: 'Inventory',
-            description: 'Track stock levels',
-            icon: <Package className="w-8 h-8" />,
-            path: '/modules/inventory',
+            title: 'Account Payables',
+            description: 'Vendor bills & payments',
+            icon: <ShoppingCart className="w-8 h-8" />,
+            path: '/modules/ap',
             favorite: true,
             color: 'bg-purple-500',
         },
         {
-            title: 'Finance',
-            description: 'Accounting & reports',
+            title: 'Cash Management',
+            description: 'Bank reconciliation & cash flow',
             icon: <DollarSign className="w-8 h-8" />,
-            path: '/modules/finance',
+            path: '/modules/cash',
             favorite: false,
             color: 'bg-yellow-500',
         },
         {
-            title: 'HR & Payroll',
-            description: 'Employee management',
-            icon: <Users className="w-8 h-8" />,
-            path: '/modules/hr',
-            favorite: false,
+            title: 'Sales',
+            description: 'Sales orders & delivery',
+            icon: <FileText className="w-8 h-8" />,
+            path: '/modules/sales',
+            favorite: true,
             color: 'bg-pink-500',
         },
         {
-            title: 'Procurement',
-            description: 'Purchase orders',
+            title: 'Purchase',
+            description: 'Purchase orders & receipts',
             icon: <ShoppingCart className="w-8 h-8" />,
-            path: '/modules/procurement',
+            path: '/modules/purchase',
             favorite: false,
             color: 'bg-indigo-500',
         },
         {
-            title: 'Manufacturing',
-            description: 'Production workflows',
-            icon: <Factory className="w-8 h-8" />,
-            path: '/modules/manufacturing',
-            favorite: false,
+            title: 'Inventory',
+            description: 'Stock control & movements',
+            icon: <Package className="w-8 h-8" />,
+            path: '/modules/inventory',
+            favorite: true,
             color: 'bg-red-500',
         },
         {
-            title: 'Analytics',
-            description: 'Business insights',
-            icon: <BarChart3 className="w-8 h-8" />,
-            path: '/modules/analytics',
+            title: 'Fixed Assets',
+            description: 'Asset register & depreciation',
+            icon: <Factory className="w-8 h-8" />,
+            path: '/modules/assets',
             favorite: false,
             color: 'bg-teal-500',
+        },
+        {
+            title: 'Project Costing',
+            description: 'Job costing & profitability',
+            icon: <BarChart3 className="w-8 h-8" />,
+            path: '/modules/projects',
+            favorite: false,
+            color: 'bg-orange-500',
         },
         ...(role === 'admin'
             ? [
                   {
                       title: 'System Admin',
-                      description: 'User roles & permissions',
+                      description: 'Users, roles & system settings',
                       icon: <Settings className="w-8 h-8" />,
                       path: '/admin',
                       favorite: false,
@@ -119,7 +125,6 @@ const Dashboard3 = () => {
     return (
         <BaseLayout title="Dashboard3" description="Welcome to your admin dashboard">
             <div className="p-6 space-y-12">
-                {/* Header */}
                 <div className="text-center space-y-2">
                     <h1 className="text-4xl font-bold tracking-tight">
                         Welcome back, {firstName}!
@@ -129,7 +134,6 @@ const Dashboard3 = () => {
                     </p>
                 </div>
 
-                {/* Expandable Cards Grid */}
                 <div className="max-w-7xl mx-auto">
                     <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {modules.map((card) => (
@@ -166,7 +170,6 @@ const Dashboard3 = () => {
                     </ul>
                 </div>
 
-                {/* Expanded Card Modal */}
                 <AnimatePresence>
                     {active && (
                         <>
