@@ -4,6 +4,10 @@ export default function LoginPage() {
     return (
         <div className="grid min-h-svh lg:grid-cols-2">
             <div className="flex flex-col gap-4 p-6 md:p-10">
+                <div className="flex items-center justify-between mb-8">
+                    <img src="/eBiz_ms-logo.svg" alt="Logo 1" className="h-14 w-auto" />
+                    <img src="/logo_mcg.svg" alt="Logo 2" className="h-14 w-auto" />
+                </div>
                 <div className="flex flex-1 items-center justify-center">
                     <div className="w-full max-w-md">
                         <LoginForm2 />

@@ -27,7 +27,6 @@ import {
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Logo } from '@/components/logo';
 import { NavMain } from '@/components/nav-main';
 import {
     Sidebar,
@@ -140,19 +139,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link to={isAuthenticated ? '/dashboard' : '/'}>
-                                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                                    <Logo size={24} />
-                                </div>
-                                <div className="grid flex-1 text-left text-sm leading-tight">
-                                    <span className="truncate font-medium">
-                                        {isAuthenticated ? 'Fine Foods ERP' : 'ShadcnStore'}
-                                    </span>
-                                    <span className="truncate text-xs">
-                                        {isAuthenticated
-                                            ? 'Advanced Bakery Solutions'
-                                            : 'Admin Dashboard'}
-                                    </span>
+                            <Link to={isAuthenticated ? '/dashboard-3' : '/'}>
+                                <div className="flex items-center">
+                                    <img
+                                        src="/eBiz_ms-logo.svg"
+                                        alt="Logo"
+                                        className="h-12 w-auto"
+                                    />
                                 </div>
                             </Link>
                         </SidebarMenuButton>
