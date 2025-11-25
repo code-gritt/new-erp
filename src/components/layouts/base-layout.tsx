@@ -95,8 +95,8 @@ export function BaseLayout({ children, title, description }: BaseLayoutProps) {
             )}
 
             {/* Theme Customizer */}
-            <ThemeCustomizerTrigger onClick={() => setThemeCustomizerOpen(true)} />
-            <ThemeCustomizer open={themeCustomizerOpen} onOpenChange={setThemeCustomizerOpen} />
+            {/* <ThemeCustomizerTrigger onClick={() => setThemeCustomizerOpen(true)} />
+            <ThemeCustomizer open={themeCustomizerOpen} onOpenChange={setThemeCustomizerOpen} /> */}
         </SidebarProvider>
     );
 }

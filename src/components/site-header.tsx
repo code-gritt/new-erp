@@ -41,9 +41,9 @@ export function SiteHeader() {
                             </div>
                         </div>
 
-                        <div className="sm:hidden text-sm font-semibold truncate">
+                        {/* <div className="sm:hidden text-sm font-semibold truncate">
                             Hi, <span className="text-primary">{firstName}</span>
-                        </div>
+                        </div> */}
 
                         {/* <div className="hidden sm:block shrink-0">
                             <SearchTrigger onClick={() => setSearchOpen(true)} />
