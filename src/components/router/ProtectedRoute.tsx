@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux';
 import { Navigate, useLocation } from 'react-router-dom';
-import { SpinnerCustom } from '../ui/spinner';
+import { FullScreenLoader } from '../ui/spinner';
 
 interface ProtectedRouteProps {
     children: React.ReactNode;
@@ -11,7 +11,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     const location = useLocation();
 
     if (isAuthenticated === null || isAuthenticated === undefined) {
-        return <SpinnerCustom />;
+        return <FullScreenLoader message="Checking authentication..." />;
     }
 
     if (!isAuthenticated || !user) {
