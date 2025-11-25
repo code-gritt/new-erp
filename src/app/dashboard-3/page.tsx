@@ -13,7 +13,6 @@ import {
     Factory,
     BarChart3,
     Settings,
-    Star,
     Users,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -198,31 +197,34 @@ export default function Dashboard3() {
 
     return (
         <BaseLayout title="" description="">
-            <div className="p-6 pt-12 min-h-screen">
+            <div className="p-8 pt-12 min-h-screen bg-background">
                 <div className="max-w-7xl mx-auto">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
                         {visibleModules.map((module) => (
                             <motion.div
                                 layoutId={`card-${module.title}-${id}`}
                                 key={module.title}
                                 onClick={() => setActive(module)}
-                                className="group relative cursor-pointer"
-                                whileHover={{ y: -4 }}
+                                className="group cursor-pointer select-none"
+                                whileHover={{ y: -8, scale: 1.05 }}
                                 whileTap={{ scale: 0.98 }}
+                                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                             >
-                                <div className="p-8 rounded-2xl bg-card border shadow-sm text-center hover:shadow-xl transition-all duration-300 group-hover:scale-[1.02]">
+                                <div className="flex flex-col items-center space-y-4 p-6 rounded-3xl hover:bg-accent/5 transition-all duration-300">
                                     <div
-                                        className={`w-20 h-20 ${module.color} rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg mx-auto`}
+                                        className={`w-16 h-16 ${module.color} rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:shadow-2xl transition-shadow`}
                                     >
                                         {module.icon}
                                     </div>
 
-                                    <h3 className="text-xl font-semibold text-foreground">
-                                        {module.title}
-                                    </h3>
-                                    <p className="text-muted-foreground mt-2 text-sm">
-                                        {module.description}
-                                    </p>
+                                    <div className="text-center space-y-1">
+                                        <h3 className="font-medium text-foreground text-sm tracking-tight">
+                                            {module.title}
+                                        </h3>
+                                        <p className="text-xs text-muted-foreground opacity-80">
+                                            {module.description}
+                                        </p>
+                                    </div>
                                 </div>
                             </motion.div>
                         ))}
@@ -236,55 +238,59 @@ export default function Dashboard3() {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
-                                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+                                className="fixed inset-0 bg-black/40 backdrop-blur-md z-50"
                                 onClick={() => setActive(null)}
                             />
-                            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+                            <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
                                 <motion.div
                                     layoutId={`card-${active.title}-${id}`}
-                                    className="max-w-2xl w-full bg-card rounded-3xl shadow-2xl overflow-hidden"
+                                    className="max-w-lg w-full bg-background/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/10 overflow-hidden"
                                 >
                                     <div
-                                        className={`h-64 ${active.color} flex items-center justify-center`}
+                                        className={`h-48 ${active.color} relative overflow-hidden`}
                                     >
-                                        <div className="scale-150 text-white opacity-90">
-                                            {active.icon}
+                                        <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent" />
+                                        <div className="flex items-center justify-center h-full">
+                                            <div className="scale-125 text-white/90">
+                                                {active.icon}
+                                            </div>
                                         </div>
                                     </div>
 
                                     <div className="p-8 space-y-6">
-                                        <div className="flex justify-between items-start">
-                                            <div>
-                                                <h3 className="text-3xl font-bold text-foreground">
-                                                    {active.title}
-                                                </h3>
-                                                <p className="text-lg text-muted-foreground mt-2">
-                                                    {active.description}
-                                                </p>
-                                            </div>
+                                        <div>
+                                            <h3 className="text-2xl font-semibold text-foreground">
+                                                {active.title}
+                                            </h3>
+                                            <p className="text-muted-foreground mt-1">
+                                                {active.description}
+                                            </p>
                                         </div>
 
-                                        <div className="bg-muted/50 rounded-xl p-6 space-y-3">
-                                            <p className="text-sm text-muted-foreground">
-                                                This module is available to your role:{' '}
-                                                <span className="font-semibold capitalize">
-                                                    {role}
+                                        <div className="text-sm space-y-2 text-muted-foreground">
+                                            <p>
+                                                Role access:{' '}
+                                                <span className="font-medium text-foreground capitalize">
+                                                    {role.replace('_', ' ')}
                                                 </span>
                                             </p>
-                                            <p className="text-sm">
-                                                Last accessed:{' '}
-                                                <span className="font-medium">Today, 3:42 PM</span>
+                                            <p>
+                                                Last opened:{' '}
+                                                <span className="font-medium">
+                                                    Today at 3:42 PM
+                                                </span>
                                             </p>
                                         </div>
 
-                                        <div className="flex gap-4 pt-4">
-                                            <Button asChild size="lg" className="flex-1">
-                                                <Link to={active.path}>Open {active.title}</Link>
+                                        <div className="flex gap-3 pt-4">
+                                            <Button asChild size="lg" className="flex-1 rounded-xl">
+                                                <Link to={active.path}>Open Module</Link>
                                             </Button>
                                             <Button
-                                                variant="outline"
+                                                variant="ghost"
                                                 size="lg"
                                                 onClick={() => setActive(null)}
+                                                className="rounded-xl"
                                             >
                                                 Close
                                             </Button>
@@ -296,7 +302,7 @@ export default function Dashboard3() {
                     )}
                 </AnimatePresence>
 
-                <div className="fixed inset-x-0 bottom-6 z-40 flex justify-center pointer-events-none">
+                <div className="fixed inset-x-0 bottom-8 z-40 flex justify-center pointer-events-none">
                     <div className="pointer-events-auto">
                         <FloatingDock items={dockItems} />
                     </div>
