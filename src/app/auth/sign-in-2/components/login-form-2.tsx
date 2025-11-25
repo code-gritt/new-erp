@@ -134,7 +134,7 @@ export function LoginForm2({ className, ...props }: React.ComponentProps<'form'>
 
             <form
                 className={cn(
-                    'flex flex-col gap-6 max-w-md w-full bg-white dark:bg-gray-800 p-8 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700',
+                    'flex flex-col gap-6 max-w-md w-full bg-white dark:bg-gray-800 p-8 rounded-xl shadow-xl/30 border border-gray-200 dark:border-gray-700',
                     className
                 )}
                 onSubmit={(e) => e.preventDefault()}
