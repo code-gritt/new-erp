@@ -3,14 +3,14 @@
 import { Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { routes, type RouteConfig } from '@/config/routes';
-import { SpinnerCustom } from '../ui/spinner';
+import { FullScreenLoader } from '../ui/spinner';
 
 function renderRoutes(routeConfigs: RouteConfig[]) {
     return routeConfigs.map((route, index) => (
         <Route
             key={route.path + index}
             path={route.path}
-            element={<Suspense fallback={<SpinnerCustom />}>{route.element}</Suspense>}
+            element={<Suspense fallback={<FullScreenLoader />}>{route.element}</Suspense>}
         >
             {route.children && renderRoutes(route.children)}
         </Route>
