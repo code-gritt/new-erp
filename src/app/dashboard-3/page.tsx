@@ -210,21 +210,19 @@ export default function Dashboard3() {
                                 whileHover={{ y: -4 }}
                                 whileTap={{ scale: 0.98 }}
                             >
-                                <div className="p-8 rounded-2xl bg-card border shadow-sm hover:shadow-xl transition-all duration-300 group-hover:scale-[1.02]">
+                                <div className="p-8 rounded-2xl bg-card border shadow-sm text-center hover:shadow-xl transition-all duration-300 group-hover:scale-[1.02]">
                                     <div
-                                        className={`w-20 h-20 ${module.color} rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg`}
+                                        className={`w-20 h-20 ${module.color} rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg mx-auto`}
                                     >
                                         {module.icon}
                                     </div>
+
                                     <h3 className="text-xl font-semibold text-foreground">
                                         {module.title}
                                     </h3>
                                     <p className="text-muted-foreground mt-2 text-sm">
                                         {module.description}
                                     </p>
-                                    {module.favorite && (
-                                        <Star className="absolute top-4 right-4 w-6 h-6 text-yellow-500 fill-current" />
-                                    )}
                                 </div>
                             </motion.div>
                         ))}
@@ -264,9 +262,6 @@ export default function Dashboard3() {
                                                     {active.description}
                                                 </p>
                                             </div>
-                                            {active.favorite && (
-                                                <Star className="w-10 h-10 text-yellow-500 fill-current" />
-                                            )}
                                         </div>
 
                                         <div className="bg-muted/50 rounded-xl p-6 space-y-3">

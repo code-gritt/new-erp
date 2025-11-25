@@ -36,10 +36,6 @@ export function SiteHeader() {
 
                     <div className="flex flex-1 items-center gap-3 min-w-0">
                         <div className="hidden sm:block flex-1 min-w-0">
-                            <div className="text-sm font-medium truncate">
-                                Welcome back,{' '}
-                                <span className="font-bold text-primary">{firstName}!</span>
-                            </div>
                             <div className="text-xs text-muted-foreground truncate">
                                 {company} • {department}
                             </div>
@@ -49,9 +45,9 @@ export function SiteHeader() {
                             Hi, <span className="text-primary">{firstName}</span>
                         </div>
 
-                        <div className="hidden sm:block shrink-0">
+                        {/* <div className="hidden sm:block shrink-0">
                             <SearchTrigger onClick={() => setSearchOpen(true)} />
-                        </div>
+                        </div> */}
                     </div>
 
                     <div className="flex items-center gap-1">
