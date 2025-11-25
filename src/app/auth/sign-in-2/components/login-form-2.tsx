@@ -19,7 +19,7 @@ import { z } from 'zod';
 import { Check, ChevronRight } from 'lucide-react';
 import type { AppDispatch } from '@/app/store';
 import { cn } from '@/lib/utils';
-import { Spinner } from '@/components/ui/spinner';
+import { SpinnerCustom } from '@/components/ui/spinner';
 
 const COMPANIES: Record<string, string[]> = {
     'Acme Corp': ['Finance', 'HR', 'Sales', 'IT', 'Operations'],
@@ -126,7 +126,7 @@ export function LoginForm2({ className, ...props }: React.ComponentProps<'form'>
             {isLoading && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
                     <div className="flex flex-col items-center gap-6">
-                        <Spinner className="size-10 text-primary" />
+                        <SpinnerCustom />
                         <p className="text-lg font-medium animate-pulse">Signing you in...</p>
                     </div>
                 </div>
