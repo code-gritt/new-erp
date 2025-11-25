@@ -4,18 +4,18 @@ import * as React from 'react';
 import { useSelector } from 'react-redux';
 import { Button } from '@/components/ui/button';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { CommandSearch, SearchTrigger } from '@/components/command-search';
+import { CommandSearch } from '@/components/command-search';
 import { ModeToggle } from '@/components/mode-toggle';
 import { NavUser } from './nav-user';
 
 export function SiteHeader() {
     const [searchOpen, setSearchOpen] = React.useState(false);
     const {
-        user,
+        // user,
         company = 'FINE FOODS HEAD OFFICE',
         department = 'ADVANCED BAKERY SOLUTIONS',
     } = useSelector((state: any) => state.auth || {});
-    const firstName = user?.name?.split(' ')[0] || 'User';
+    // const firstName = user?.name?.split(' ')[0] || 'User';
 
     React.useEffect(() => {
         const down = (e: KeyboardEvent) => {
@@ -36,22 +36,18 @@ export function SiteHeader() {
 
                     <div className="flex flex-1 items-center gap-3 min-w-0">
                         <div className="hidden sm:block flex-1 min-w-0">
-                            <div className="text-sm font-medium truncate">
-                                Welcome back,{' '}
-                                <span className="font-bold text-primary">{firstName}!</span>
-                            </div>
                             <div className="text-xs text-muted-foreground truncate">
                                 {company} • {department}
                             </div>
                         </div>
 
-                        <div className="sm:hidden text-sm font-semibold truncate">
+                        {/* <div className="sm:hidden text-sm font-semibold truncate">
                             Hi, <span className="text-primary">{firstName}</span>
-                        </div>
+                        </div> */}
 
-                        <div className="hidden sm:block shrink-0">
+                        {/* <div className="hidden sm:block shrink-0">
                             <SearchTrigger onClick={() => setSearchOpen(true)} />
-                        </div>
+                        </div> */}
                     </div>
 
                     <div className="flex items-center gap-1">
