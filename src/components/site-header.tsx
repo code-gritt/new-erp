@@ -4,18 +4,18 @@ import * as React from 'react';
 import { useSelector } from 'react-redux';
 import { Button } from '@/components/ui/button';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { CommandSearch, SearchTrigger } from '@/components/command-search';
+import { CommandSearch } from '@/components/command-search';
 import { ModeToggle } from '@/components/mode-toggle';
 import { NavUser } from './nav-user';
 
 export function SiteHeader() {
     const [searchOpen, setSearchOpen] = React.useState(false);
     const {
-        user,
+        // user,
         company = 'FINE FOODS HEAD OFFICE',
         department = 'ADVANCED BAKERY SOLUTIONS',
     } = useSelector((state: any) => state.auth || {});
-    const firstName = user?.name?.split(' ')[0] || 'User';
+    // const firstName = user?.name?.split(' ')[0] || 'User';
 
     React.useEffect(() => {
         const down = (e: KeyboardEvent) => {

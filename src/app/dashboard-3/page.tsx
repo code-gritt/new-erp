@@ -249,7 +249,7 @@ export default function Dashboard3() {
                                     <div
                                         className={`h-48 ${active.color} relative overflow-hidden`}
                                     >
-                                        <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent" />
+                                        <div className="absolute inset-0 bg-linear-to-br from-white/20 to-transparent" />
                                         <div className="flex items-center justify-center h-full">
                                             <div className="scale-125 text-white/90">
                                                 {active.icon}

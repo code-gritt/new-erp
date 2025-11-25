@@ -167,7 +167,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarContent>
 
             <SidebarFooter>
-                <Button onClick={handleLogout} variant="ghost" size="sm" className="gap-2">
+                <Button
+                    onClick={handleLogout}
+                    variant="ghost"
+                    size="sm"
+                    className="gap-2 cursor-pointer"
+                >
                     <LogOut className="h-4 w-4" />
                     <span className="hidden sm:inline">Logout</span>
                 </Button>
