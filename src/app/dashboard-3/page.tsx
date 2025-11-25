@@ -155,35 +155,36 @@ export default function Dashboard() {
 
     return (
         <BaseLayout title="" description="">
-            <div className="min-h-screen bg-background pt-12 pb-24 px-6">
-                <div className="max-w-7xl mx-auto">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
+            <div className="min-h-screen bg-background pt-8 sm:pt-12 pb-24 px-4 sm:px-6">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 sm:gap-8">
                         {visibleModules.map((module) => (
                             <motion.div
                                 key={module.title}
                                 onClick={() => setActive(module)}
-                                className="group cursor-pointer"
+                                className="group cursor-pointer select-none"
                                 whileHover={{ y: -5, scale: 1 }}
-                                whileTap={{ scale: 0.98 }}
+                                whileTap={{ scale: 0.96 }}
                                 transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                             >
                                 <div
-                                    className="relative p-8 rounded-3xl bg-background/70 backdrop-blur-xl border border-white/10 
-                                shadow-lg hover:shadow-2xl hover:bg-background/90 
-                                transition-all duration-300 flex flex-col items-center text-center h-full"
+                                    className="relative p-5 sm:p-7 rounded-3xl bg-background/70 backdrop-blur-xl border border-white/10 
+                        shadow-md hover:shadow-xl hover:bg-background/90 
+                        transition-all duration-300 flex flex-col items-center text-center h-full"
                                 >
                                     <div
-                                        className={`w-20 h-20 ${module.color} rounded-3xl flex items-center justify-center text-white 
-                                  shadow-2xl group-hover:shadow-3xl transition-shadow duration-300`}
+                                        className={`w-14 h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 ${module.color} rounded-2xl sm:rounded-3xl 
+                          flex items-center justify-center text-white 
+                          shadow-lg group-hover:shadow-2xl transition-shadow duration-300`}
                                     >
                                         {module.icon}
                                     </div>
 
-                                    <div className="mt-6 space-y-2">
-                                        <h3 className="font-semibold text-foreground text-base tracking-tight">
+                                    <div className="mt-4 sm:mt-5 space-y-1.5 sm:space-y-2">
+                                        <h3 className="font-semibold text-foreground text-sm sm:text-base tracking-tight line-clamp-2">
                                             {module.title}
                                         </h3>
-                                        <p className="text-sm text-muted-foreground/80 leading-snug px-2">
+                                        <p className="text-xs sm:text-sm text-muted-foreground/80 leading-tight px-1 line-clamp-2">
                                             {module.description}
                                         </p>
                                     </div>
