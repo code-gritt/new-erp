@@ -21,7 +21,6 @@ import * as LucideIcons from 'lucide-react';
 import type { UserModule, ModuleCard } from '@/types/dashboard';
 import { ModuleDetailModal } from './components/module-detail-modal';
 
-// Floating Dock
 const dockItems = [
     { title: 'Dashboard', icon: <IconHome className="h-full w-full" />, href: '/dashboard-3' },
     { title: 'Files', icon: <IconFolderOpen className="h-full w-full" />, href: '/files' },
@@ -32,54 +31,27 @@ const dockItems = [
     { title: 'Settings', icon: <IconSettings className="h-full w-full" />, href: '/settings' },
 ] as const;
 
-/* ==============================================
-   1. DYNAMIC ICON FROM API
-   ============================================== */
 const getDynamicIcon = (iconName: string | null): React.ReactNode => {
     if (!iconName) return <LucideIcons.FileText className="w-9 h-9" />;
 
     const Icon = (LucideIcons as any)[iconName] as
         | React.ComponentType<{ className?: string }>
         | undefined;
-
     return Icon ? <Icon className="w-9 h-9" /> : <LucideIcons.FileText className="w-9 h-9" />;
 };
 
 const getDynamicColor = (iconName: string | null): string => {
     if (!iconName) return 'bg-gray-500';
-    const name = iconName.toLowerCase();
+    const n = iconName.toLowerCase();
 
-    if (name.includes('dollar') || name.includes('currency') || name.includes('cash'))
-        return 'bg-emerald-500';
-    if (name.includes('file') || name.includes('text') || name.includes('document'))
-        return 'bg-blue-500';
-    if (name.includes('shopping') || name.includes('cart') || name.includes('basket'))
-        return 'bg-pink-500';
-    if (name.includes('package') || name.includes('box') || name.includes('cube'))
-        return 'bg-orange-500';
-    if (name.includes('factory') || name.includes('building') || name.includes('industry'))
-        return 'bg-purple-500';
-    if (
-        name.includes('chart') ||
-        name.includes('bar') ||
-        name.includes('pie') ||
-        name.includes('graph')
-    )
-        return 'bg-indigo-500';
-    if (
-        name.includes('users') ||
-        name.includes('user') ||
-        name.includes('people') ||
-        name.includes('team')
-    )
-        return 'bg-cyan-500';
-    if (
-        name.includes('settings') ||
-        name.includes('cog') ||
-        name.includes('gear') ||
-        name.includes('sliders')
-    )
-        return 'bg-gray-600';
+    if (n.includes('dollar') || n.includes('cash')) return 'bg-emerald-500';
+    if (n.includes('file') || n.includes('text')) return 'bg-blue-500';
+    if (n.includes('shopping') || n.includes('cart')) return 'bg-pink-500';
+    if (n.includes('package') || n.includes('box')) return 'bg-orange-500';
+    if (n.includes('factory') || n.includes('building')) return 'bg-purple-500';
+    if (n.includes('chart') || n.includes('bar') || n.includes('graph')) return 'bg-indigo-500';
+    if (n.includes('users') || n.includes('people') || n.includes('team')) return 'bg-cyan-500';
+    if (n.includes('settings') || n.includes('cog') || n.includes('gear')) return 'bg-gray-600';
 
     return 'bg-gray-500';
 };
@@ -100,25 +72,22 @@ export default function Dashboard() {
                 ...m,
                 icon: getDynamicIcon(m.icon),
                 color: getDynamicColor(m.icon),
-                path: m.front_end_url || '/modules/placeholder',
+                path: m.front_end_url || '#',
             })
         );
 
-    if (loading) {
+    if (loading)
         return (
             <div className="flex min-h-screen items-center justify-center">
-                <p className="text-lg font-medium">Loading your modules...</p>
+                <p className="text-lg">Loading modules...</p>
             </div>
         );
-    }
-
-    if (error) {
+    if (error)
         return (
             <div className="flex min-h-screen items-center justify-center text-red-500">
-                <p>Failed to load modules. Please try again.</p>
+                <p>Failed to load modules.</p>
             </div>
         );
-    }
 
     return (
         <BaseLayout title="Dashboard" description="Your ERP modules">
@@ -140,7 +109,6 @@ export default function Dashboard() {
                                     >
                                         {module.icon}
                                     </div>
-
                                     <div className="mt-5 space-y-2">
                                         <h3 className="font-semibold text-foreground text-base tracking-tight">
                                             {module.module_name}
