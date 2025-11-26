@@ -101,7 +101,7 @@ export default function Dashboard() {
     }
 
     return (
-        <BaseLayout title="Dashboard" description="Your ERP modules">
+        <BaseLayout title="" description="">
             <div className="min-h-screen bg-background pt-8 pb-32 px-4">
                 <div className="max-w-7xl mx-auto">
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
