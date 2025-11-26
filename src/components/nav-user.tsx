@@ -72,7 +72,7 @@ export function NavUser() {
                         >
                             <div className="relative">
                                 <Avatar className="h-8 w-8 rounded-lg">
-                                    <AvatarFallback className="rounded-lg bg-gradient-to-br from-orange-500 to-amber-600 text-white text-xs font-bold">
+                                    <AvatarFallback className="rounded-lg bg-linear-to-br from-orange-500 to-amber-600 text-white text-xs font-bold">
                                         {initials}
                                     </AvatarFallback>
                                 </Avatar>
@@ -106,7 +106,7 @@ export function NavUser() {
                         <DropdownMenuLabel className="p-0">
                             <div className="flex items-center gap-3 p-3">
                                 <Avatar className="h-12 w-12 rounded-lg">
-                                    <AvatarFallback className="rounded-lg bg-gradient-to-br from-orange-500 to-amber-600 text-white font-bold text-lg">
+                                    <AvatarFallback className="rounded-lg bg-linear-to-br from-orange-500 to-amber-600 text-white font-bold text-lg">
                                         {initials}
                                     </AvatarFallback>
                                 </Avatar>

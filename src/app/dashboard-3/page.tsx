@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { FloatingDock } from '@/components/ui/floating-dock';
 import { useQuery } from '@apollo/client';
-import { gql } from '@apollo/client';
+import { GET_USER_MODULES } from '@/graphql/queries/getUserModules';
 import {
     FileText,
     DollarSign,
@@ -18,41 +18,14 @@ import {
     BarChart3,
     Settings,
     Users,
-    Building,
-    Briefcase,
 } from 'lucide-react';
-import {
-    IconDownload,
-    IconFileText,
-    IconFolderOpen,
-    IconHome,
-    IconSettings,
-    IconTrash,
-    IconUser,
-} from '@tabler/icons-react';
+import { IconHome, IconUser, IconSettings } from '@tabler/icons-react';
 
 const dockItems = [
-    { title: 'Dashboard', icon: <IconHome className="h-full w-full" />, href: '/dashboard' },
-    { title: 'Files', icon: <IconFolderOpen className="h-full w-full" />, href: '/files' },
-    { title: 'Downloads', icon: <IconDownload className="h-full w-full" />, href: '/downloads' },
-    { title: 'Documents', icon: <IconFileText className="h-full w-full" />, href: '/documents' },
-    { title: 'Trash', icon: <IconTrash className="h-full w-full" />, href: '/trash' },
+    { title: 'Dashboard', icon: <IconHome className="h-full w-full" />, href: '/dashboard-3' },
     { title: 'Profile', icon: <IconUser className="h-full w-full" />, href: '/profile' },
     { title: 'Settings', icon: <IconSettings className="h-full w-full" />, href: '/settings' },
 ];
-
-const GET_USER_MODULES = gql`
-    query GetUserModules {
-        getUserModules {
-            module_id
-            module_name
-            module_description
-            front_end_url
-            icon
-            access
-        }
-    }
-`;
 
 const iconMap: Record<string, React.ReactNode> = {
     FileText: <FileText className="w-9 h-9" />,
@@ -63,8 +36,6 @@ const iconMap: Record<string, React.ReactNode> = {
     BarChart3: <BarChart3 className="w-9 h-9" />,
     Settings: <Settings className="w-9 h-9" />,
     Users: <Users className="w-9 h-9" />,
-    Building: <Building className="w-9 h-9" />,
-    Briefcase: <Briefcase className="w-9 h-9" />,
 };
 
 const colorMap: Record<string, string> = {
@@ -86,7 +57,11 @@ export default function Dashboard() {
     const { token } = useSelector((state: any) => state.auth);
 
     const { data, loading, error } = useQuery(GET_USER_MODULES, {
-        context: { headers: { Authorization: `Bearer ${token}` } },
+        context: {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        },
         skip: !token,
     });
 
@@ -96,20 +71,28 @@ export default function Dashboard() {
             ...m,
             icon: iconMap[m.icon] || <FileText className="w-9 h-9" />,
             color: colorMap[m.module_name] || 'bg-gray-500',
-            path: '/modules/placeholder', // Will be replaced later
+            path: '/modules/placeholder', // Will be updated when routing is ready
         }));
 
-    if (loading)
+    if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
-                <p>Loading modules...</p>
+                <p className="text-lg">Loading your modules...</p>
             </div>
         );
-    if (error) return <div className="text-red-500 text-center">Failed to load modules</div>;
+    }
+
+    if (error) {
+        return (
+            <div className="flex items-center justify-center min-h-screen text-red-500">
+                <p>Failed to load modules. Please try again.</p>
+            </div>
+        );
+    }
 
     return (
         <BaseLayout title="Dashboard" description="Your ERP modules">
-            <div className="min-h-screen bg-background pt-8 pb-24 px-4">
+            <div className="min-h-screen bg-background pt-8 pb-32 px-4">
                 <div className="max-w-7xl mx-auto">
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                         {modules.map((module: any) => (
@@ -117,20 +100,21 @@ export default function Dashboard() {
                                 key={module.module_id}
                                 onClick={() => setActive(module)}
                                 className="group cursor-pointer select-none"
-                                whileHover={{ y: -6 }}
+                                whileHover={{ y: -8, scale: 1.02 }}
                                 whileTap={{ scale: 0.96 }}
+                                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                             >
                                 <div className="relative p-6 rounded-3xl bg-background/70 backdrop-blur-xl border border-white/10 shadow-lg hover:shadow-2xl transition-all duration-300 h-full flex flex-col items-center text-center">
                                     <div
-                                        className={`${module.color} w-16 h-16 rounded-3xl flex items-center justify-center text-white shadow-xl`}
+                                        className={`${module.color} w-16 h-16 rounded-3xl flex items-center justify-center text-white shadow-xl group-hover:scale-110 transition-transform`}
                                     >
                                         {module.icon}
                                     </div>
-                                    <div className="mt-4 space-y-2">
-                                        <h3 className="font-semibold text-foreground text-base">
+                                    <div className="mt-5 space-y-2">
+                                        <h3 className="font-semibold text-foreground text-base tracking-tight">
                                             {module.module_name}
                                         </h3>
-                                        <p className="text-xs text-muted-foreground line-clamp-2">
+                                        <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
                                             {module.module_description}
                                         </p>
                                     </div>
@@ -140,6 +124,7 @@ export default function Dashboard() {
                     </div>
                 </div>
 
+                {/* Module Detail Modal */}
                 <AnimatePresence>
                     {active && (
                         <>
@@ -147,36 +132,42 @@ export default function Dashboard() {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
-                                className="fixed inset-0 bg-black/60 backdrop-blur-md z-50"
+                                className="fixed inset-0 bg-black/70 backdrop-blur-md z-50"
                                 onClick={() => setActive(null)}
                             />
                             <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
                                 <motion.div
-                                    initial={{ scale: 0.9, opacity: 0 }}
-                                    animate={{ scale: 1, opacity: 1 }}
-                                    exit={{ scale: 0.9, opacity: 0 }}
+                                    initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                                    animate={{ scale: 1, opacity: 1, y: 0 }}
+                                    exit={{ scale: 0.9, opacity: 0, y: 20 }}
                                     className="max-w-lg w-full"
                                 >
-                                    <div className="bg-background/95 backdrop-blur-2xl rounded-3xl shadow-2xl overflow-hidden">
-                                        <div className={`h-52 ${active.color} relative`}>
-                                            <div className="absolute inset-0 bg-black/20" />
+                                    <div className="bg-background/96 backdrop-blur-2xl rounded-3xl shadow-2xl overflow-hidden border border-white/10">
+                                        <div
+                                            className={`h-56 ${active.color} relative overflow-hidden`}
+                                        >
+                                            <div className="absolute inset-0 bg-gradient-to-br from-black/30 to-transparent" />
                                             <div className="flex h-full items-center justify-center">
-                                                <div className="scale-150 text-white">
+                                                <div className="scale-[3.5] text-white opacity-90">
                                                     {active.icon}
                                                 </div>
                                             </div>
                                         </div>
                                         <div className="p-8 space-y-6">
                                             <div>
-                                                <h3 className="text-3xl font-bold">
+                                                <h3 className="text-3xl font-bold text-foreground">
                                                     {active.module_name}
                                                 </h3>
-                                                <p className="text-muted-foreground mt-2">
+                                                <p className="text-muted-foreground mt-3 text-base leading-relaxed">
                                                     {active.module_description}
                                                 </p>
                                             </div>
                                             <div className="flex gap-4">
-                                                <Button asChild size="lg" className="flex-1">
+                                                <Button
+                                                    asChild
+                                                    size="lg"
+                                                    className="flex-1 rounded-xl font-medium"
+                                                >
                                                     <Link to={active.path}>Open Module</Link>
                                                 </Button>
                                                 <Button
@@ -195,6 +186,7 @@ export default function Dashboard() {
                     )}
                 </AnimatePresence>
 
+                {/* Floating Dock */}
                 <div className="fixed inset-x-0 bottom-8 z-40 flex justify-center pointer-events-none">
                     <div className="pointer-events-auto">
                         <FloatingDock items={dockItems} />

@@ -18,39 +18,10 @@ import {
 import { Check, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SpinnerCustom } from '@/components/ui/spinner';
-import { useMutation, gql } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import type { AppDispatch } from '@/app/store';
-
-const LOGIN_MUTATION = gql`
-    mutation Login($userId: String!, $password: String!) {
-        login(userId: $userId, password: $password) {
-            token
-            message
-            user {
-                userId
-                username
-                email
-                companies {
-                    company_id
-                    company_name
-                    divisions {
-                        div_id
-                        div_name
-                    }
-                }
-            }
-        }
-    }
-`;
-
-const SELECT_COMPANY_DIVISION = gql`
-    mutation SelectCompanyDivision($userId: String!, $companyId: String!, $divId: String!) {
-        selectCompanyDivision(userId: $userId, companyId: $companyId, divId: $divId) {
-            token
-            message
-        }
-    }
-`;
+import { LOGIN_MUTATION } from '@/graphql/mutations/login';
+import { SELECT_COMPANY_DIVISION } from '@/graphql/mutations/selectCompanyDivision';
 
 interface Company {
     company_id: string;
@@ -138,8 +109,8 @@ export function LoginForm2({ className, ...props }: React.ComponentProps<'form'>
                             companyName: selectedCompanyData?.company_name.trim() || 'N/A',
                             divisionId: selectedDivision,
                             divisionName:
-                                divisions.find((d: any) => d.div_id === selectedDivision)
-                                    ?.div_name || 'N/A',
+                                divisions.find((d) => d.div_id === selectedDivision)?.div_name ||
+                                'N/A',
                         },
                     })
                 );
@@ -149,7 +120,7 @@ export function LoginForm2({ className, ...props }: React.ComponentProps<'form'>
             }
         } catch (err: any) {
             console.error('Select company error:', err);
-            toast.error(err.message || 'Failed to start session. Token missing or invalid.');
+            toast.error(err.message || 'Failed to start session');
         }
     };
 

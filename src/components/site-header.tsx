@@ -7,7 +7,7 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import { CommandSearch } from '@/components/command-search';
 import { ModeToggle } from '@/components/mode-toggle';
 import { NavUser } from './nav-user';
-import { Badge, BellIcon } from 'lucide-react';
+import { BellIcon, Badge } from 'lucide-react';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -15,13 +15,19 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from './ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu';
 import { Link } from 'react-router-dom';
+import type { RootState } from '@/app/store';
 
 export function SiteHeader() {
     const [searchOpen, setSearchOpen] = React.useState(false);
-    const { company = 'FINE FOODS HEAD OFFICE', department = 'ADVANCED BAKERY SOLUTIONS' } =
-        useSelector((state: any) => state.auth || {});
+
+    const user = useSelector((state: RootState) => state.auth.user);
+    const companyName = user?.companyName;
+    const divisionName = user?.divisionName;
+
+    const displayCompany = companyName || 'Loading...';
+    const displayDivision = divisionName || 'Loading...';
 
     React.useEffect(() => {
         const down = (e: KeyboardEvent) => {
@@ -34,13 +40,13 @@ export function SiteHeader() {
         return () => document.removeEventListener('keydown', down);
     }, []);
 
-    const NotificationMenu = ({ notificationCount = 3 }) => (
+    const NotificationMenu = ({ notificationCount = 3 }: { notificationCount?: number }) => (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-9 w-9 relative">
+                <Button variant="ghost" size="icon" className="relative h-9 w-9">
                     <BellIcon className="h-4 w-4" />
                     {notificationCount > 0 && (
-                        <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs">
+                        <Badge className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center p-0 text-xs font-bold">
                             {notificationCount > 9 ? '9+' : notificationCount}
                         </Badge>
                     )}
@@ -48,30 +54,26 @@ export function SiteHeader() {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-80">
-                <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+                <DropdownMenuLabel className="font-semibold">Notifications</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                    <div className="flex flex-col gap-1">
-                        <p className="text-sm font-medium">New message received</p>
-                        <p className="text-xs text-muted-foreground">2 minutes ago</p>
-                    </div>
+                <DropdownMenuItem className="flex flex-col items-start gap-1">
+                    <p className="text-sm font-medium">New message received</p>
+                    <p className="text-xs text-muted-foreground">2 minutes ago</p>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                    <div className="flex flex-col gap-1">
-                        <p className="text-sm font-medium">System update available</p>
-                        <p className="text-xs text-muted-foreground">1 hour ago</p>
-                    </div>
+                <DropdownMenuItem className="flex flex-col items-start gap-1">
+                    <p className="text-sm font-medium">System update available</p>
+                    <p className="text-xs text-muted-foreground">1 hour ago</p>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                    <div className="flex flex-col gap-1">
-                        <p className="text-sm font-medium">Weekly report ready</p>
-                        <p className="text-xs text-muted-foreground">3 hours ago</p>
-                    </div>
+                <DropdownMenuItem className="flex flex-col items-start gap-1">
+                    <p className="text-sm font-medium">Weekly report ready</p>
+                    <p className="text-xs text-muted-foreground">3 hours ago</p>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <Link to={'/settings/notifications'}>
-                    <DropdownMenuItem>View all notifications</DropdownMenuItem>
-                </Link>
+                <DropdownMenuItem asChild>
+                    <Link to="/settings/notifications" className="w-full">
+                        View all notifications
+                    </Link>
+                </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     );
@@ -84,19 +86,25 @@ export function SiteHeader() {
 
                     <div className="flex flex-1 items-center gap-3 min-w-0">
                         <div className="hidden sm:block flex-1 min-w-0">
-                            <div className="text-xs text-muted-foreground truncate">
-                                {company} • {department}
+                            <div className="text-xs font-medium text-muted-foreground truncate">
+                                {displayCompany} • {displayDivision}
                             </div>
+                            {user?.userId && (
+                                <div className="text-xs text-muted-foreground/80 truncate mt-0.5">
+                                    Logged in as{' '}
+                                    <span className="font-semibold">{user.userId}</span>
+                                </div>
+                            )}
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3">
                         <div className="hidden lg:flex items-center gap-1">
                             <Button variant="ghost" size="sm" className="text-xs">
                                 User Logs
                             </Button>
                             <Button variant="ghost" size="sm" className="text-xs font-bold">
-                                SUPER
+                                {user?.userId || 'USER'}
                             </Button>
                             <Button variant="ghost" size="sm" className="text-xs">
                                 Approve
