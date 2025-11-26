@@ -21,7 +21,6 @@ import { SpinnerCustom } from '@/components/ui/spinner';
 import { useMutation, gql } from '@apollo/client';
 import type { AppDispatch } from '@/app/store';
 
-// GraphQL Mutations & Queries
 const LOGIN_MUTATION = gql`
     mutation Login($userId: String!, $password: String!) {
         login(userId: $userId, password: $password) {
@@ -69,6 +68,7 @@ export function LoginForm2({ className, ...props }: React.ComponentProps<'form'>
     const [companies, setCompanies] = useState<Company[]>([]);
     const [selectedCompany, setSelectedCompany] = useState('');
     const [selectedDivision, setSelectedDivision] = useState('');
+    const [loginToken, setLoginToken] = useState<string>('');
     const [loginData, setLoginData] = useState<any>(null);
 
     const [loginMutation, { loading: loginLoading }] = useMutation(LOGIN_MUTATION);
@@ -91,6 +91,8 @@ export function LoginForm2({ className, ...props }: React.ComponentProps<'form'>
             });
 
             if (data?.login?.token) {
+                const token = data.login.token;
+                setLoginToken(token);
                 setLoginData(data.login);
                 setCompanies(data.login.user.companies);
                 setStep(2);
@@ -114,12 +116,16 @@ export function LoginForm2({ className, ...props }: React.ComponentProps<'form'>
                     companyId: selectedCompany,
                     divId: selectedDivision,
                 },
+                context: {
+                    headers: {
+                        Authorization: `Bearer ${loginToken}`,
+                    },
+                },
             });
 
             if (data?.selectCompanyDivision?.token) {
                 const sessionToken = data.selectCompanyDivision.token;
 
-                // Just replace the dispatch part:
                 dispatch(
                     login({
                         token: sessionToken,
@@ -127,22 +133,23 @@ export function LoginForm2({ className, ...props }: React.ComponentProps<'form'>
                             userId: loginData.user.userId,
                             username: loginData.user.username,
                             email: loginData.user.email,
-                            role: 'admin' as UserRole, // or map from API later
+                            role: 'admin' as UserRole,
                             companyId: selectedCompany,
                             companyName: selectedCompanyData?.company_name.trim() || 'N/A',
                             divisionId: selectedDivision,
                             divisionName:
-                                divisions.find((d) => d.div_id === selectedDivision)?.div_name ||
-                                'N/A',
+                                divisions.find((d: any) => d.div_id === selectedDivision)
+                                    ?.div_name || 'N/A',
                         },
                     })
                 );
 
-                toast.success('Session started successfully!');
+                toast.success('Welcome! Session started.');
                 navigate('/dashboard-3');
             }
         } catch (err: any) {
-            toast.error(err.message || 'Failed to start session');
+            console.error('Select company error:', err);
+            toast.error(err.message || 'Failed to start session. Token missing or invalid.');
         }
     };
 
@@ -174,7 +181,6 @@ export function LoginForm2({ className, ...props }: React.ComponentProps<'form'>
                     </p>
                 </div>
 
-                {/* Stepper */}
                 <div className="flex items-center justify-center gap-6 mt-4 w-full">
                     <div className="flex flex-col items-center gap-1 flex-1">
                         <div
