@@ -5,7 +5,7 @@ import { logout } from '@/features/auth/authSlice';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useEffect, useRef, useState } from 'react';
-import { CreditCard, LogOut, BellDot, CircleUser, Building2, EllipsisVertical } from 'lucide-react';
+import { CreditCard, LogOut, BellDot, CircleUser, EllipsisVertical } from 'lucide-react';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -36,8 +36,6 @@ export function NavUser() {
         .join('')
         .toUpperCase()
         .slice(0, 2);
-
-    const companyInfo = `${user.companyName || 'Unknown Company'} • ${user.divisionName || 'N/A'}`;
 
     const resetIdleTimer = () => {
         setStatus('online');
@@ -113,10 +111,6 @@ export function NavUser() {
                                 <div className="grid flex-1">
                                     <p className="text-sm font-semibold">{displayName}</p>
                                     <p className="text-xs text-muted-foreground">{user.email}</p>
-                                    <div className="flex items-center gap-1.5 mt-1 text-xs text-orange-600 dark:text-orange-400">
-                                        <Building2 className="h-3 w-3" />
-                                        <span className="font-medium">{companyInfo}</span>
-                                    </div>
                                     <div className="flex items-center gap-2 mt-2">
                                         <div
                                             className={`h-2 w-2 rounded-full animate-pulse ${
