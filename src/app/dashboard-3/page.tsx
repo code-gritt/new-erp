@@ -6,16 +6,6 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { FloatingDock } from '@/components/ui/floating-dock';
 import { useQuery } from '@apollo/client';
-import {
-    FileText,
-    DollarSign,
-    ShoppingCart,
-    Package,
-    Factory,
-    BarChart3,
-    Settings,
-    Users,
-} from 'lucide-react';
 import { GET_USER_MODULES } from '@/graphql/queries/getUserModules';
 import {
     IconHome,
@@ -26,42 +16,44 @@ import {
     IconUser,
     IconSettings,
 } from '@tabler/icons-react';
+import * as LucideIcons from 'lucide-react';
+
 import type { UserModule, ModuleCard } from '@/types/dashboard';
 import { ModuleDetailModal } from './components/module-detail-modal';
 
 const dockItems = [
-    { title: 'Dashboard', icon: <IconHome className="h-full w-full" />, href: '/dashboard' },
+    { title: 'Dashboard', icon: <IconHome className="h-full w-full" />, href: '/dashboard-3' },
     { title: 'Files', icon: <IconFolderOpen className="h-full w-full" />, href: '/files' },
     { title: 'Downloads', icon: <IconDownload className="h-full w-full" />, href: '/downloads' },
     { title: 'Documents', icon: <IconFileText className="h-full w-full" />, href: '/documents' },
     { title: 'Trash', icon: <IconTrash className="h-full w-full" />, href: '/trash' },
     { title: 'Profile', icon: <IconUser className="h-full w-full" />, href: '/profile' },
     { title: 'Settings', icon: <IconSettings className="h-full w-full" />, href: '/settings' },
-];
+] as const;
 
-const iconMap: Record<string, React.ReactNode> = {
-    FileText: <FileText className="w-9 h-9" />,
-    DollarSign: <DollarSign className="w-9 h-9" />,
-    ShoppingCart: <ShoppingCart className="w-9 h-9" />,
-    Package: <Package className="w-9 h-9" />,
-    Factory: <Factory className="w-9 h-9" />,
-    BarChart3: <BarChart3 className="w-9 h-9" />,
-    Settings: <Settings className="w-9 h-9" />,
-    Users: <Users className="w-9 h-9" />,
+const getDynamicIcon = (iconName: string | null): React.ReactNode => {
+    if (!iconName) return <LucideIcons.FileText className="w-9 h-9" />;
+
+    const Icon = (LucideIcons as any)[iconName] as
+        | React.ComponentType<{ className?: string }>
+        | undefined;
+    return Icon ? <Icon className="w-9 h-9" /> : <LucideIcons.FileText className="w-9 h-9" />;
 };
 
-const colorMap: Record<string, string> = {
-    'General Ledger': 'bg-blue-500',
-    'Accounts Receivable': 'bg-green-500',
-    'Accounts Payable': 'bg-purple-500',
-    'Cash Management': 'bg-yellow-600',
-    Sales: 'bg-pink-500',
-    Purchase: 'bg-indigo-500',
-    'Stock Control': 'bg-red-500',
-    'Fixed Assets': 'bg-teal-500',
-    'Job Costing': 'bg-orange-500',
-    'HR & Payroll Module': 'bg-cyan-500',
-    'System Administration': 'bg-gray-600',
+const getDynamicColor = (iconName: string | null): string => {
+    if (!iconName) return 'bg-gray-500';
+    const n = iconName.toLowerCase();
+
+    if (n.includes('dollar') || n.includes('cash')) return 'bg-emerald-500';
+    if (n.includes('file') || n.includes('text')) return 'bg-blue-500';
+    if (n.includes('shopping') || n.includes('cart')) return 'bg-pink-500';
+    if (n.includes('package') || n.includes('box')) return 'bg-orange-500';
+    if (n.includes('factory') || n.includes('building')) return 'bg-purple-500';
+    if (n.includes('chart') || n.includes('bar') || n.includes('graph')) return 'bg-indigo-500';
+    if (n.includes('users') || n.includes('people') || n.includes('team')) return 'bg-cyan-500';
+    if (n.includes('settings') || n.includes('cog') || n.includes('gear')) return 'bg-gray-600';
+
+    return 'bg-gray-500';
 };
 
 export default function Dashboard() {
@@ -78,30 +70,27 @@ export default function Dashboard() {
         .map(
             (m): ModuleCard => ({
                 ...m,
-                icon: iconMap[m.icon] || <FileText className="w-9 h-9" />,
-                color: colorMap[m.module_name] || 'bg-gray-500',
-                path: '/modules/placeholder',
+                icon: getDynamicIcon(m.icon),
+                color: getDynamicColor(m.icon),
+                path: m.front_end_url || '#',
             })
         );
 
-    if (loading) {
+    if (loading)
         return (
             <div className="flex min-h-screen items-center justify-center">
-                <p className="text-lg font-medium">Loading your modules...</p>
+                <p className="text-lg">Loading modules...</p>
             </div>
         );
-    }
-
-    if (error) {
+    if (error)
         return (
             <div className="flex min-h-screen items-center justify-center text-red-500">
-                <p>Failed to load modules. Please try again.</p>
+                <p>Failed to load modules.</p>
             </div>
         );
-    }
 
     return (
-        <BaseLayout title="" description="">
+        <BaseLayout title="Dashboard" description="Your ERP modules">
             <div className="min-h-screen bg-background pt-8 pb-32 px-4">
                 <div className="max-w-7xl mx-auto">
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">

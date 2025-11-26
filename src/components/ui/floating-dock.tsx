@@ -16,7 +16,7 @@ export const FloatingDock = ({
     desktopClassName,
     mobileClassName,
 }: {
-    items: { title: string; icon: React.ReactNode; href: string }[];
+    items: readonly { title: string; icon: React.ReactNode; href: string }[];
     desktopClassName?: string;
     mobileClassName?: string;
 }) => {
@@ -32,7 +32,7 @@ const FloatingDockMobile = ({
     items,
     className,
 }: {
-    items: { title: string; icon: React.ReactNode; href: string }[];
+    items: readonly { title: string; icon: React.ReactNode; href: string }[];
     className?: string;
 }) => {
     const [open, setOpen] = useState(false);
@@ -91,7 +91,7 @@ const FloatingDockDesktop = ({
     items,
     className,
 }: {
-    items: { title: string; icon: React.ReactNode; href: string }[];
+    items: readonly { title: string; icon: React.ReactNode; href: string }[];
     className?: string;
 }) => {
     let mouseX = useMotionValue(Infinity);

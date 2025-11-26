@@ -2,11 +2,14 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
 import type { ModuleDetailModalProps } from '@/types/dashboard';
 
 export function ModuleDetailModal({ module, onClose }: ModuleDetailModalProps) {
     if (!module) return null;
+
+    const handleOpenModule = () => {
+        window.location.href = module.path;
+    };
 
     return (
         <AnimatePresence>
@@ -50,11 +53,11 @@ export function ModuleDetailModal({ module, onClose }: ModuleDetailModalProps) {
 
                                     <div className="flex gap-4 pt-4">
                                         <Button
-                                            asChild
+                                            onClick={handleOpenModule}
                                             size="lg"
                                             className="flex-1 rounded-xl font-semibold text-base shadow-lg hover:shadow-xl transition-shadow"
                                         >
-                                            <Link to={module.path}>Open Module</Link>
+                                            Open Module
                                         </Button>
                                         <Button
                                             variant="ghost"
