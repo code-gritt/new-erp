@@ -80,7 +80,7 @@ export function SiteHeader() {
 
     return (
         <>
-            <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+            <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 rounded-xl">
                 <div className="flex w-full items-center gap-4 px-3 sm:px-4 lg:px-6">
                     <SidebarTrigger className="-ml-1 size-8" />
 
