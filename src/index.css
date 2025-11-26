@@ -44,7 +44,7 @@
 
 :root {
     --font-inter: 'Inter', system-ui, sans-serif;
-    --background: oklch(0.9383 0.0042 236.4993);
+    --background: rgb(249 250 251);
     --foreground: oklch(0.3211 0 0);
     --card: oklch(1 0 0);
     --card-foreground: oklch(0.3211 0 0);
