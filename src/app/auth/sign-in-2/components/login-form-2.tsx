@@ -261,7 +261,7 @@ export function LoginForm2({ className, ...props }: React.ComponentProps<'form'>
                                     variant="outline"
                                     onClick={() => setStep(1)}
                                     disabled={isLoading}
-                                    className="w-28"
+                                    className="flex-1"
                                 >
                                     Back
                                 </Button>
