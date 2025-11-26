@@ -5,9 +5,7 @@ import { logout } from '@/features/auth/authSlice';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useEffect, useRef, useState } from 'react';
-
 import { CreditCard, LogOut, BellDot, CircleUser, Building2, EllipsisVertical } from 'lucide-react';
-
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -18,7 +16,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import type { RootState } from '@/app/store';
 
 export function NavUser() {
@@ -31,27 +29,26 @@ export function NavUser() {
 
     if (!user) return null;
 
-    const initials = user.name
+    const displayName = user.username || 'User';
+    const initials = displayName
         .split(' ')
-        .map((n) => n[0])
+        .map((n: string) => n[0])
         .join('')
-        .toUpperCase();
+        .toUpperCase()
+        .slice(0, 2);
+
+    const companyInfo = `${user.companyName || 'Unknown Company'} • ${user.divisionName || 'N/A'}`;
 
     const resetIdleTimer = () => {
         setStatus('online');
         if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current);
-
-        idleTimeoutRef.current = setTimeout(() => {
-            setStatus('idle');
-        }, 10_000);
+        idleTimeoutRef.current = setTimeout(() => setStatus('idle'), 10_000);
     };
 
     useEffect(() => {
         const events = ['mousemove', 'mousedown', 'keypress', 'scroll', 'touchstart', 'click'];
         events.forEach((event) => window.addEventListener(event, resetIdleTimer));
-
         resetIdleTimer();
-
         return () => {
             events.forEach((event) => window.removeEventListener(event, resetIdleTimer));
             if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current);
@@ -75,14 +72,12 @@ export function NavUser() {
                         >
                             <div className="relative">
                                 <Avatar className="h-8 w-8 rounded-lg">
-                                    <AvatarImage src={user.avatar} alt={user.name} />
-                                    <AvatarFallback className="rounded-lg bg-orange-500 text-white text-xs font-medium">
+                                    <AvatarFallback className="rounded-lg bg-gradient-to-br from-orange-500 to-amber-600 text-white text-xs font-bold">
                                         {initials}
                                     </AvatarFallback>
                                 </Avatar>
-
                                 <div
-                                    className={`absolute bottom-0 right-0 flex items-center justify-center h-3 w-3.5 rounded-full ring-4 ring-sidebar transition-colors duration-300 ${
+                                    className={`absolute bottom-0 right-0 h-3 w-3.5 rounded-full ring-4 ring-sidebar transition-colors ${
                                         status === 'online' ? 'bg-emerald-500' : 'bg-amber-500'
                                     }`}
                                     title={status === 'online' ? 'Online' : 'Away'}
@@ -92,12 +87,11 @@ export function NavUser() {
                             </div>
 
                             <div className="grid flex-1 text-left text-sm leading-tight">
-                                <span className="truncate font-semibold">{user.name}</span>
+                                <span className="truncate font-semibold">{displayName}</span>
                                 <span className="truncate text-xs text-muted-foreground">
                                     {user.email}
                                 </span>
                             </div>
-
                             <EllipsisVertical className="ml-auto size-4" />
                         </SidebarMenuButton>
                     </DropdownMenuTrigger>
@@ -111,25 +105,17 @@ export function NavUser() {
                     >
                         <DropdownMenuLabel className="p-0">
                             <div className="flex items-center gap-3 p-3">
-                                <div className="relative">
-                                    <Avatar className="h-12 w-12 rounded-lg">
-                                        <AvatarImage src={user.avatar} alt={user.name} />
-                                        <AvatarFallback className="rounded-lg bg-linear-to-br from-orange-500 to-amber-600 text-white font-bold">
-                                            {initials}
-                                        </AvatarFallback>
-                                    </Avatar>
-                                </div>
-
+                                <Avatar className="h-12 w-12 rounded-lg">
+                                    <AvatarFallback className="rounded-lg bg-gradient-to-br from-orange-500 to-amber-600 text-white font-bold text-lg">
+                                        {initials}
+                                    </AvatarFallback>
+                                </Avatar>
                                 <div className="grid flex-1">
-                                    <p className="text-sm font-semibold leading-tight">
-                                        {user.name}
-                                    </p>
+                                    <p className="text-sm font-semibold">{displayName}</p>
                                     <p className="text-xs text-muted-foreground">{user.email}</p>
                                     <div className="flex items-center gap-1.5 mt-1 text-xs text-orange-600 dark:text-orange-400">
                                         <Building2 className="h-3 w-3" />
-                                        <span className="font-medium">
-                                            {user.company} • {user.department}
-                                        </span>
+                                        <span className="font-medium">{companyInfo}</span>
                                     </div>
                                     <div className="flex items-center gap-2 mt-2">
                                         <div
