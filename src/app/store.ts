@@ -1,3 +1,4 @@
+// src/app/store.ts
 import { configureStore } from '@reduxjs/toolkit';
 import { persistStore } from 'redux-persist';
 import authReducer from '@/features/auth/authSlice';
@@ -8,11 +9,12 @@ export const store = configureStore({
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
-            serializableCheck: false,
+            serializableCheck: {
+                ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
+            },
         }),
 });
 
 export const persistor = persistStore(store);
-
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
