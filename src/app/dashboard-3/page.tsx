@@ -19,10 +19,22 @@ import {
     Settings,
     Users,
 } from 'lucide-react';
-import { IconHome, IconUser, IconSettings } from '@tabler/icons-react';
+import {
+    IconHome,
+    IconUser,
+    IconSettings,
+    IconDownload,
+    IconFileText,
+    IconFolderOpen,
+    IconTrash,
+} from '@tabler/icons-react';
 
 const dockItems = [
-    { title: 'Dashboard', icon: <IconHome className="h-full w-full" />, href: '/dashboard-3' },
+    { title: 'Dashboard', icon: <IconHome className="h-full w-full" />, href: '/dashboard' },
+    { title: 'Files', icon: <IconFolderOpen className="h-full w-full" />, href: '/files' },
+    { title: 'Downloads', icon: <IconDownload className="h-full w-full" />, href: '/downloads' },
+    { title: 'Documents', icon: <IconFileText className="h-full w-full" />, href: '/documents' },
+    { title: 'Trash', icon: <IconTrash className="h-full w-full" />, href: '/trash' },
     { title: 'Profile', icon: <IconUser className="h-full w-full" />, href: '/profile' },
     { title: 'Settings', icon: <IconSettings className="h-full w-full" />, href: '/settings' },
 ];
@@ -71,7 +83,7 @@ export default function Dashboard() {
             ...m,
             icon: iconMap[m.icon] || <FileText className="w-9 h-9" />,
             color: colorMap[m.module_name] || 'bg-gray-500',
-            path: '/modules/placeholder', // Will be updated when routing is ready
+            path: '/modules/placeholder',
         }));
 
     if (loading) {
@@ -124,7 +136,6 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* Module Detail Modal */}
                 <AnimatePresence>
                     {active && (
                         <>
@@ -146,7 +157,7 @@ export default function Dashboard() {
                                         <div
                                             className={`h-56 ${active.color} relative overflow-hidden`}
                                         >
-                                            <div className="absolute inset-0 bg-gradient-to-br from-black/30 to-transparent" />
+                                            <div className="absolute inset-0 bg-linear-to-br from-black/30 to-transparent" />
                                             <div className="flex h-full items-center justify-center">
                                                 <div className="scale-[3.5] text-white opacity-90">
                                                     {active.icon}
@@ -186,7 +197,6 @@ export default function Dashboard() {
                     )}
                 </AnimatePresence>
 
-                {/* Floating Dock */}
                 <div className="fixed inset-x-0 bottom-8 z-40 flex justify-center pointer-events-none">
                     <div className="pointer-events-auto">
                         <FloatingDock items={dockItems} />
