@@ -1,103 +1,95 @@
-import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
 export type UserRole = 'admin' | 'sales_manager' | 'hr_manager' | 'employee';
 
 export interface User {
-    id: string;
-    name: string;
+    userId: string;
+    username: string;
     email: string;
     role: UserRole;
-    avatar?: string;
-    company: string;
-    department: string;
+    companyId: string;
+    companyName: string;
+    divisionId: string;
+    divisionName: string;
 }
 
 interface AuthState {
     user: User | null;
+    token: string | null;
     isAuthenticated: boolean;
+    isLoading: boolean;
+    error: string | null;
 }
 
-const mockUsers: Record<string, User> = {
-    'admin@enterprise.com': {
-        id: '1',
-        name: 'John Admin',
-        email: 'admin@enterprise.com',
-        role: 'admin',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin',
-        company: 'Acme Corp',
-        department: 'Executive',
-    },
-    'sales@enterprise.com': {
-        id: '2',
-        name: 'Sarah Sales',
-        email: 'sales@enterprise.com',
-        role: 'sales_manager',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=sales',
-        company: 'Acme Corp',
-        department: 'Sales',
-    },
-    'hr@enterprise.com': {
-        id: '3',
-        name: 'Mike HR',
-        email: 'hr@enterprise.com',
-        role: 'hr_manager',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=hr',
-        company: 'Acme Corp',
-        department: 'Human Resources',
-    },
-    'user@enterprise.com': {
-        id: '4',
-        name: 'Emma Employee',
-        email: 'user@enterprise.com',
-        role: 'employee',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=emma',
-        company: 'Acme Corp',
-        department: 'Operations',
-    },
+const initialState: AuthState = {
+    user: null,
+    token: null,
+    isAuthenticated: false,
+    isLoading: false,
+    error: null,
 };
 
 export const login = createAsyncThunk(
     'auth/login',
     async (
         {
-            email,
-            password,
-            company,
-            department,
-        }: { email: string; password: string; company: string; department: string },
+            token,
+            user,
+        }: {
+            token: string;
+            user: {
+                userId: string;
+                username: string;
+                email: string;
+                role: UserRole;
+                companyId: string;
+                companyName: string;
+                divisionId: string;
+                divisionName: string;
+            };
+        },
         { rejectWithValue }
     ) => {
-        await new Promise((r) => setTimeout(r, 400));
-
-        const user = mockUsers[email.toLowerCase()];
-        if (!user || password !== 'password') {
-            return rejectWithValue('Invalid credentials');
+        try {
+            return { token, user };
+        } catch (err) {
+            return rejectWithValue('Session failed');
         }
-
-        return { ...user, company, department };
     }
 );
 
 const authSlice = createSlice({
     name: 'auth',
-    initialState: { user: null, isAuthenticated: false } as AuthState,
+    initialState,
     reducers: {
         logout: (state) => {
             state.user = null;
+            state.token = null;
             state.isAuthenticated = false;
+            state.error = null;
         },
     },
     extraReducers: (builder) => {
         builder
-            .addCase(login.fulfilled, (state, action: PayloadAction<User>) => {
-                state.user = action.payload;
-                state.isAuthenticated = true;
+            .addCase(login.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
             })
-            .addCase(login.rejected, (state) => {
-                state.user = null;
+            .addCase(login.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.isAuthenticated = true;
+                state.token = action.payload.token;
+                state.user = action.payload.user;
+                state.error = null;
+            })
+            .addCase(login.rejected, (state, action) => {
+                state.isLoading = false;
                 state.isAuthenticated = false;
+                state.token = null;
+                state.user = null;
+                state.error = (action.payload as string) || 'Login failed';
             });
     },
 });
@@ -105,7 +97,7 @@ const authSlice = createSlice({
 const persistConfig = {
     key: 'auth',
     storage,
-    whitelist: ['user', 'isAuthenticated'],
+    whitelist: ['user', 'token', 'isAuthenticated'],
 };
 
 export const { logout } = authSlice.actions;

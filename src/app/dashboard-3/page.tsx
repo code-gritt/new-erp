@@ -2,9 +2,10 @@
 
 import { BaseLayout } from '@/components/layouts/base-layout';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { FloatingDock } from '@/components/ui/floating-dock';
+import { useQuery } from '@apollo/client';
 import {
     FileText,
     DollarSign,
@@ -15,28 +16,18 @@ import {
     Settings,
     Users,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { FloatingDock } from '@/components/ui/floating-dock';
+import { GET_USER_MODULES } from '@/graphql/queries/getUserModules';
 import {
     IconHome,
-    IconUser,
-    IconSettings,
     IconFolderOpen,
     IconDownload,
     IconFileText,
     IconTrash,
+    IconUser,
+    IconSettings,
 } from '@tabler/icons-react';
-
-type UserRole = 'admin' | 'sales_manager' | 'hr_manager' | 'employee';
-
-interface Module {
-    title: string;
-    description: string;
-    icon: React.ReactNode;
-    path: string;
-    color: string;
-    roles: UserRole[];
-}
+import type { UserModule, ModuleCard } from '@/types/dashboard';
+import { ModuleDetailModal } from './components/module-detail-modal';
 
 const dockItems = [
     { title: 'Dashboard', icon: <IconHome className="h-full w-full" />, href: '/dashboard' },
@@ -48,144 +39,93 @@ const dockItems = [
     { title: 'Settings', icon: <IconSettings className="h-full w-full" />, href: '/settings' },
 ];
 
-const modules: Module[] = [
-    {
-        title: 'General Ledger',
-        description: 'Chart of accounts & journals',
-        icon: <FileText className="w-9 h-9" />,
-        path: '/modules/gl',
-        color: 'bg-blue-500',
-        roles: ['admin', 'sales_manager', 'employee'],
-    },
-    {
-        title: 'Account Receivables',
-        description: 'Customer invoices & receipts',
-        icon: <DollarSign className="w-9 h-9" />,
-        path: '/modules/ar',
-        color: 'bg-green-500',
-        roles: ['admin', 'sales_manager'],
-    },
-    {
-        title: 'Account Payables',
-        description: 'Vendor bills & payments',
-        icon: <ShoppingCart className="w-9 h-9" />,
-        path: '/modules/ap',
-        color: 'bg-purple-500',
-        roles: ['admin'],
-    },
-    {
-        title: 'Cash Management',
-        description: 'Bank reconciliation & cash flow',
-        icon: <DollarSign className="w-9 h-9" />,
-        path: '/modules/cash',
-        color: 'bg-yellow-500',
-        roles: ['admin'],
-    },
-    {
-        title: 'Sales',
-        description: 'Sales orders & delivery',
-        icon: <FileText className="w-9 h-9" />,
-        path: '/modules/sales',
-        color: 'bg-pink-500',
-        roles: ['admin', 'sales_manager'],
-    },
-    {
-        title: 'Purchase',
-        description: 'Purchase orders & receipts',
-        icon: <ShoppingCart className="w-9 h-9" />,
-        path: '/modules/purchase',
-        color: 'bg-indigo-500',
-        roles: ['admin'],
-    },
-    {
-        title: 'Inventory',
-        description: 'Stock control & movements',
-        icon: <Package className="w-9 h-9" />,
-        path: '/modules/inventory',
-        color: 'bg-red-500',
-        roles: ['admin', 'employee'],
-    },
-    {
-        title: 'Fixed Assets',
-        description: 'Asset register & depreciation',
-        icon: <Factory className="w-9 h-9" />,
-        path: '/modules/assets',
-        color: 'bg-teal-500',
-        roles: ['admin'],
-    },
-    {
-        title: 'Project Costing',
-        description: 'Job costing & profitability',
-        icon: <BarChart3 className="w-9 h-9" />,
-        path: '/modules/projects',
-        color: 'bg-orange-500',
-        roles: ['admin'],
-    },
-    {
-        title: 'Human Resources',
-        description: 'Employee records, payroll & leave',
-        icon: <Users className="w-9 h-9" />,
-        path: '/modules/hr',
-        color: 'bg-cyan-500',
-        roles: ['admin', 'hr_manager'],
-    },
-    {
-        title: 'System Admin',
-        description: 'Users, roles, permissions & audit logs',
-        icon: <Settings className="w-9 h-9" />,
-        path: '/admin',
-        color: 'bg-gray-600',
-        roles: ['admin'],
-    },
-];
+const iconMap: Record<string, React.ReactNode> = {
+    FileText: <FileText className="w-9 h-9" />,
+    DollarSign: <DollarSign className="w-9 h-9" />,
+    ShoppingCart: <ShoppingCart className="w-9 h-9" />,
+    Package: <Package className="w-9 h-9" />,
+    Factory: <Factory className="w-9 h-9" />,
+    BarChart3: <BarChart3 className="w-9 h-9" />,
+    Settings: <Settings className="w-9 h-9" />,
+    Users: <Users className="w-9 h-9" />,
+};
+
+const colorMap: Record<string, string> = {
+    'General Ledger': 'bg-blue-500',
+    'Accounts Receivable': 'bg-green-500',
+    'Accounts Payable': 'bg-purple-500',
+    'Cash Management': 'bg-yellow-600',
+    Sales: 'bg-pink-500',
+    Purchase: 'bg-indigo-500',
+    'Stock Control': 'bg-red-500',
+    'Fixed Assets': 'bg-teal-500',
+    'Job Costing': 'bg-orange-500',
+    'HR & Payroll Module': 'bg-cyan-500',
+    'System Administration': 'bg-gray-600',
+};
 
 export default function Dashboard() {
-    const { role = 'employee' } = useSelector((state: any) => state.auth?.user || {});
-    const [active, setActive] = useState<Module | null>(null);
+    const [activeModule, setActiveModule] = useState<ModuleCard | null>(null);
+    const { token } = useSelector((state: any) => state.auth);
 
-    const visibleModules = modules.filter((m) => m.roles.includes(role as UserRole));
+    const { data, loading, error } = useQuery<{ getUserModules: UserModule[] }>(GET_USER_MODULES, {
+        context: { headers: { Authorization: `Bearer ${token}` } },
+        skip: !token,
+    });
 
-    useEffect(() => {
-        const handleEsc = (e: KeyboardEvent) => e.key === 'Escape' && setActive(null);
-        if (active) document.body.style.overflow = 'hidden';
-        else document.body.style.overflow = 'unset';
-        window.addEventListener('keydown', handleEsc);
-        return () => window.removeEventListener('keydown', handleEsc);
-    }, [active]);
+    const modules: ModuleCard[] = (data?.getUserModules || [])
+        .filter((m): m is UserModule => m.access === 'Y')
+        .map(
+            (m): ModuleCard => ({
+                ...m,
+                icon: iconMap[m.icon] || <FileText className="w-9 h-9" />,
+                color: colorMap[m.module_name] || 'bg-gray-500',
+                path: '/modules/placeholder',
+            })
+        );
+
+    if (loading) {
+        return (
+            <div className="flex min-h-screen items-center justify-center">
+                <p className="text-lg font-medium">Loading your modules...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex min-h-screen items-center justify-center text-red-500">
+                <p>Failed to load modules. Please try again.</p>
+            </div>
+        );
+    }
 
     return (
         <BaseLayout title="" description="">
-            <div className="min-h-screen bg-background pt-8 sm:pt-12 pb-24 px-4 sm:px-6">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 sm:gap-8">
-                        {visibleModules.map((module) => (
+            <div className="min-h-screen bg-background pt-8 pb-32 px-4">
+                <div className="max-w-7xl mx-auto">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                        {modules.map((module) => (
                             <motion.div
-                                key={module.title}
-                                onClick={() => setActive(module)}
+                                key={module.module_id}
+                                onClick={() => setActiveModule(module)}
                                 className="group cursor-pointer select-none"
-                                whileHover={{ y: -5, scale: 1 }}
+                                whileHover={{ y: -8, scale: 1.02 }}
                                 whileTap={{ scale: 0.96 }}
                                 transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                             >
-                                <div
-                                    className="relative p-5 sm:p-7 rounded-3xl bg-background/70 backdrop-blur-xl border border-white/10 
-                        shadow-md hover:shadow-xl hover:bg-background/90 
-                        transition-all duration-300 flex flex-col items-center text-center h-full"
-                                >
+                                <div className="relative p-6 rounded-3xl bg-background/70 backdrop-blur-xl border border-white/10 shadow-lg hover:shadow-2xl transition-all duration-300 h-full flex flex-col items-center text-center">
                                     <div
-                                        className={`w-14 h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 ${module.color} rounded-2xl sm:rounded-3xl 
-                          flex items-center justify-center text-white 
-                          shadow-lg group-hover:shadow-2xl transition-shadow duration-300`}
+                                        className={`${module.color} w-16 h-16 rounded-3xl flex items-center justify-center text-white shadow-xl group-hover:scale-110 transition-transform`}
                                     >
                                         {module.icon}
                                     </div>
-
-                                    <div className="mt-4 sm:mt-5 space-y-1.5 sm:space-y-2">
-                                        <h3 className="font-semibold text-foreground text-sm sm:text-base tracking-tight line-clamp-2">
-                                            {module.title}
+                                    <div className="mt-5 space-y-2">
+                                        <h3 className="font-semibold text-foreground text-base tracking-tight">
+                                            {module.module_name}
                                         </h3>
-                                        <p className="text-xs sm:text-sm text-muted-foreground/80 leading-tight px-1 line-clamp-2">
-                                            {module.description}
+                                        <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                                            {module.module_description}
                                         </p>
                                     </div>
                                 </div>
@@ -194,93 +134,13 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                <AnimatePresence>
-                    {active && (
-                        <>
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                className="fixed inset-0 bg-black/60 backdrop-blur-md z-50"
-                                onClick={() => setActive(null)}
-                            />
-
-                            <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
-                                <motion.div
-                                    initial={{ opacity: 0, scale: 0.94, y: 30 }}
-                                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                                    exit={{ opacity: 0, scale: 0.94, y: 30 }}
-                                    transition={{ type: 'spring', damping: 32, stiffness: 380 }}
-                                    className="max-w-lg w-full pointer-events-auto"
-                                >
-                                    <div className="bg-background/96 backdrop-blur-2xl rounded-3xl shadow-2xl overflow-hidden">
-                                        <div
-                                            className={`h-52 ${active.color} relative overflow-hidden`}
-                                        >
-                                            <div className="absolute inset-0 bg-linear-to-br from-white/30 to-transparent opacity-60" />
-                                            <div className="absolute inset-0 bg-black/10" />
-                                            <div className="flex h-full items-center justify-center">
-                                                <div className="scale-[2.8] text-white drop-shadow-xl">
-                                                    {active.icon}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="p-9 space-y-8">
-                                            <div className="space-y-3">
-                                                <h3 className="text-3xl font-semibold text-foreground tracking-tight">
-                                                    {active.title}
-                                                </h3>
-                                                <p className="text-muted-foreground text-base leading-relaxed">
-                                                    {active.description}
-                                                </p>
-                                            </div>
-
-                                            <div className="text-sm space-y-2 text-muted-foreground/90">
-                                                <p>
-                                                    Access level:{' '}
-                                                    <span className="font-medium text-foreground capitalize">
-                                                        {role.replace('_', ' ')}
-                                                    </span>
-                                                </p>
-                                                <p>
-                                                    Last opened:{' '}
-                                                    <span className="font-medium text-foreground">
-                                                        Today at 3:42 PM
-                                                    </span>
-                                                </p>
-                                            </div>
-
-                                            <div className="flex gap-4 pt-4">
-                                                <Button
-                                                    asChild
-                                                    size="lg"
-                                                    className="flex-1 rounded-xl font-medium text-base"
-                                                >
-                                                    <Link to={active.path}>Open Module</Link>
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="lg"
-                                                    onClick={() => setActive(null)}
-                                                    className="rounded-xl"
-                                                >
-                                                    Close
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            </div>
-                        </>
-                    )}
-                </AnimatePresence>
-
                 <div className="fixed inset-x-0 bottom-8 z-40 flex justify-center pointer-events-none">
                     <div className="pointer-events-auto">
                         <FloatingDock items={dockItems} />
                     </div>
                 </div>
+
+                <ModuleDetailModal module={activeModule} onClose={() => setActiveModule(null)} />
             </div>
         </BaseLayout>
     );

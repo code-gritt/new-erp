@@ -1,10 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { login } from '@/features/auth/authSlice';
-import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -18,7 +14,6 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { z } from 'zod';
-import type { AppDispatch } from '@/app/store';
 import { Check, ChevronRight } from 'lucide-react';
 
 const COMPANIES: Record<string, string[]> = {
@@ -26,13 +21,6 @@ const COMPANIES: Record<string, string[]> = {
     'Stark Industries': ['R&D', 'Defense', 'Energy', 'AI'],
     'Wayne Enterprises': ['Security', 'Philanthropy', 'Gotham'],
     Oscorp: ['Genetics', 'Chemicals', 'Bio'],
-};
-
-const mockUsers = {
-    'admin@enterprise.com': { name: 'John Admin', role: 'admin' },
-    'sales@enterprise.com': { name: 'Sarah Sales', role: 'sales_manager' },
-    'hr@enterprise.com': { name: 'Mike HR', role: 'hr_manager' },
-    'user@enterprise.com': { name: 'Emma Employee', role: 'employee' },
 };
 
 const loginSchema = z.object({
@@ -44,14 +32,12 @@ const loginSchema = z.object({
 });
 
 export default function LoginForm3() {
-    const dispatch = useDispatch<AppDispatch>();
-    const navigate = useNavigate();
     const [step, setStep] = useState(1);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [company, setCompany] = useState('');
     const [department, setDepartment] = useState('');
-    const [loading, setLoading] = useState(false);
+    const [loading] = useState(false);
 
     const [errors, setErrors] = useState<{ username?: string; password?: string }>({});
 
@@ -74,40 +60,6 @@ export default function LoginForm3() {
 
     const handleContinue = () => {
         if (validateStep1()) setStep(2);
-    };
-
-    const handleLogin = async () => {
-        if (!company || !department) return;
-
-        setLoading(true);
-        const input = username.toLowerCase().trim();
-        let foundEmail = null;
-
-        for (const [email, user] of Object.entries(mockUsers)) {
-            if (
-                email.includes(input) ||
-                user.name.toLowerCase().includes(input) ||
-                email.split('@')[0] === input
-            ) {
-                foundEmail = email;
-                break;
-            }
-        }
-
-        if (foundEmail) {
-            try {
-                await dispatch(
-                    login({ email: foundEmail, password: 'password', company, department })
-                ).unwrap();
-                toast.success('Login successful');
-                navigate('/dashboard');
-            } catch (error) {
-                toast.error('Login failed');
-            }
-        } else {
-            toast.error('User not found');
-        }
-        setLoading(false);
     };
 
     return (
@@ -269,7 +221,6 @@ export default function LoginForm3() {
                                                 <Button
                                                     size="lg"
                                                     className="flex-1"
-                                                    onClick={handleLogin}
                                                     disabled={!company || !department || loading}
                                                 >
                                                     {loading ? 'Signing in...' : 'Sign In'}
