@@ -134,20 +134,22 @@ export function LoginForm2({ className, ...props }: React.ComponentProps<'form'>
 
             <form
                 className={cn(
-                    'flex flex-col gap-6 max-w-md w-full bg-white dark:bg-gray-800 p-8 rounded-xl shadow-xl/30 border border-gray-200 dark:border-gray-700',
+                    'flex flex-col gap-8 max-w-md w-full bg-white dark:bg-gray-800 p-8 rounded-xl shadow-xl/30 border border-gray-200 dark:border-gray-700',
                     className
                 )}
                 onSubmit={(e) => e.preventDefault()}
                 {...props}
             >
-                <div className="flex flex-col items-center gap-2 text-center">
+                {/* Header */}
+                <div className="flex flex-col items-center gap-1 text-center">
                     <h1 className="text-2xl font-bold">Welcome Back</h1>
                     <p className="text-muted-foreground text-sm">
                         Sign in to access your ERP system
                     </p>
                 </div>
 
-                <div className="flex items-center justify-center gap-6 mt-4 w-full">
+                {/* Progress Steps */}
+                <div className="flex items-center justify-center gap-6 mt-2 w-full">
                     <div className="flex flex-col items-center gap-1 flex-1">
                         <div
                             className={cn(
@@ -159,7 +161,9 @@ export function LoginForm2({ className, ...props }: React.ComponentProps<'form'>
                         </div>
                         <p className="text-xs mt-1">Credentials</p>
                     </div>
+
                     <div className={cn('h-0.5 flex-1', step >= 2 ? 'bg-primary' : 'bg-muted')} />
+
                     <div className="flex flex-col items-center gap-1 flex-1">
                         <div
                             className={cn(
@@ -169,26 +173,30 @@ export function LoginForm2({ className, ...props }: React.ComponentProps<'form'>
                         >
                             2
                         </div>
-                        <p className="text-xs mt-1">Company & Division</p>
+                        <p className="text-xs mt-1 text-center">Company & Division</p>
                     </div>
                 </div>
 
+                {/* Step 1 — Credentials */}
                 {step === 1 ? (
                     <>
-                        <div className="space-y-4">
+                        <div className="space-y-6">
                             <div>
-                                <Label>User ID</Label>
+                                <Label className="mb-2 block">User ID</Label>
                                 <Input
+                                    className="w-full"
                                     placeholder="Enter User ID (e.g., SUPER)"
                                     value={userId}
                                     onChange={(e) => setUserId(e.target.value)}
                                     autoFocus
                                 />
                             </div>
+
                             <div>
-                                <Label>Password</Label>
+                                <Label className="mb-2 block">Password</Label>
                                 <Input
                                     type="password"
+                                    className="w-full"
                                     placeholder="Enter password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
@@ -201,15 +209,17 @@ export function LoginForm2({ className, ...props }: React.ComponentProps<'form'>
                         </Button>
                     </>
                 ) : (
+                    /* Step 2 — Company + Division */
                     <>
-                        <div className="space-y-5">
+                        <div className="space-y-6">
                             <div>
-                                <Label>Company</Label>
+                                <Label className="mb-2 block">Company</Label>
                                 <Select value={selectedCompany} onValueChange={setSelectedCompany}>
-                                    <SelectTrigger className="mt-2">
+                                    <SelectTrigger className="w-full">
                                         <SelectValue placeholder="Select company" />
                                     </SelectTrigger>
-                                    <SelectContent>
+
+                                    <SelectContent className="w-full">
                                         {companies.map((c) => (
                                             <SelectItem key={c.company_id} value={c.company_id}>
                                                 {c.company_name.trim()}
@@ -220,13 +230,13 @@ export function LoginForm2({ className, ...props }: React.ComponentProps<'form'>
                             </div>
 
                             <div>
-                                <Label>Division</Label>
+                                <Label className="mb-2 block">Division</Label>
                                 <Select
                                     value={selectedDivision}
                                     onValueChange={setSelectedDivision}
                                     disabled={!selectedCompany}
                                 >
-                                    <SelectTrigger className="mt-2">
+                                    <SelectTrigger className="w-full">
                                         <SelectValue
                                             placeholder={
                                                 selectedCompany
@@ -235,7 +245,8 @@ export function LoginForm2({ className, ...props }: React.ComponentProps<'form'>
                                             }
                                         />
                                     </SelectTrigger>
-                                    <SelectContent>
+
+                                    <SelectContent className="w-full">
                                         {divisions.map((d) => (
                                             <SelectItem key={d.div_id} value={d.div_id}>
                                                 {d.div_name}
@@ -245,14 +256,16 @@ export function LoginForm2({ className, ...props }: React.ComponentProps<'form'>
                                 </Select>
                             </div>
 
-                            <div className="flex gap-3 pt-4">
+                            <div className="flex gap-3 pt-2">
                                 <Button
                                     variant="outline"
                                     onClick={() => setStep(1)}
                                     disabled={isLoading}
+                                    className="w-28"
                                 >
                                     Back
                                 </Button>
+
                                 <Button
                                     onClick={handleSignIn}
                                     disabled={!selectedCompany || !selectedDivision || isLoading}
