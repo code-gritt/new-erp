@@ -91,7 +91,7 @@ export function LoginForm2({ className, ...props }: React.ComponentProps<'form'>
 
             if (data?.selectCompanyDivision?.token) {
                 const sessionToken = data.selectCompanyDivision.token;
-
+                const serverMessage = data.selectCompanyDivision.message;
                 dispatch(
                     login({
                         token: sessionToken,
@@ -110,7 +110,8 @@ export function LoginForm2({ className, ...props }: React.ComponentProps<'form'>
                     })
                 );
 
-                toast.success('Welcome! Session started.');
+                toast.success(serverMessage || 'Welcome back!');
+
                 navigate('/dashboard-3');
             }
         } catch (err: any) {
