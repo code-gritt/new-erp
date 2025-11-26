@@ -22,12 +22,7 @@ import { useMutation } from '@apollo/client';
 import type { AppDispatch } from '@/app/store';
 import { LOGIN_MUTATION } from '@/graphql/mutations/login';
 import { SELECT_COMPANY_DIVISION } from '@/graphql/mutations/selectCompanyDivision';
-
-interface Company {
-    company_id: string;
-    company_name: string;
-    divisions: { div_id: string; div_name: string }[];
-}
+import type { Company } from '@/types/auth';
 
 export function LoginForm2({ className, ...props }: React.ComponentProps<'form'>) {
     const dispatch = useDispatch<AppDispatch>();
