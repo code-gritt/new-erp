@@ -6,16 +6,6 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { FloatingDock } from '@/components/ui/floating-dock';
 import { useQuery } from '@apollo/client';
-import {
-    FileText,
-    DollarSign,
-    ShoppingCart,
-    Package,
-    Factory,
-    BarChart3,
-    Settings,
-    Users,
-} from 'lucide-react';
 import { GET_USER_MODULES } from '@/graphql/queries/getUserModules';
 import {
     IconHome,
@@ -26,28 +16,37 @@ import {
     IconUser,
     IconSettings,
 } from '@tabler/icons-react';
+import * as LucideIcons from 'lucide-react';
+
 import type { UserModule, ModuleCard } from '@/types/dashboard';
 import { ModuleDetailModal } from './components/module-detail-modal';
 
 const dockItems = [
-    { title: 'Dashboard', icon: <IconHome className="h-full w-full" />, href: '/dashboard' },
+    { title: 'Dashboard', icon: <IconHome className="h-full w-full" />, href: '/dashboard-3' },
     { title: 'Files', icon: <IconFolderOpen className="h-full w-full" />, href: '/files' },
     { title: 'Downloads', icon: <IconDownload className="h-full w-full" />, href: '/downloads' },
     { title: 'Documents', icon: <IconFileText className="h-full w-full" />, href: '/documents' },
     { title: 'Trash', icon: <IconTrash className="h-full w-full" />, href: '/trash' },
     { title: 'Profile', icon: <IconUser className="h-full w-full" />, href: '/profile' },
     { title: 'Settings', icon: <IconSettings className="h-full w-full" />, href: '/settings' },
-];
+] as const;
 
-const iconMap: Record<string, React.ReactNode> = {
-    FileText: <FileText className="w-9 h-9" />,
-    DollarSign: <DollarSign className="w-9 h-9" />,
-    ShoppingCart: <ShoppingCart className="w-9 h-9" />,
-    Package: <Package className="w-9 h-9" />,
-    Factory: <Factory className="w-9 h-9" />,
-    BarChart3: <BarChart3 className="w-9 h-9" />,
-    Settings: <Settings className="w-9 h-9" />,
-    Users: <Users className="w-9 h-9" />,
+const getDynamicIcon = (iconName: string | null): React.ReactNode => {
+    if (!iconName) {
+        const Fallback = LucideIcons.FileText;
+        return <Fallback className="w-9 h-9" />;
+    }
+
+    const IconComponent = (LucideIcons as any)[iconName] as
+        | React.ComponentType<{ className?: string }>
+        | undefined;
+
+    if (IconComponent) {
+        return <IconComponent className="w-9 h-9" />;
+    }
+
+    const Default = LucideIcons.FileText;
+    return <Default className="w-9 h-9" />;
 };
 
 const colorMap: Record<string, string> = {
@@ -78,9 +77,9 @@ export default function Dashboard() {
         .map(
             (m): ModuleCard => ({
                 ...m,
-                icon: iconMap[m.icon] || <FileText className="w-9 h-9" />,
+                icon: getDynamicIcon(m.icon),
                 color: colorMap[m.module_name] || 'bg-gray-500',
-                path: '/modules/placeholder',
+                path: m.front_end_url || '/modules/placeholder',
             })
         );
 
@@ -101,7 +100,7 @@ export default function Dashboard() {
     }
 
     return (
-        <BaseLayout title="" description="">
+        <BaseLayout title="Dashboard" description="Your ERP modules">
             <div className="min-h-screen bg-background pt-8 pb-32 px-4">
                 <div className="max-w-7xl mx-auto">
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
@@ -120,6 +119,7 @@ export default function Dashboard() {
                                     >
                                         {module.icon}
                                     </div>
+
                                     <div className="mt-5 space-y-2">
                                         <h3 className="font-semibold text-foreground text-base tracking-tight">
                                             {module.module_name}
