@@ -17,9 +17,9 @@ import {
     IconSettings,
 } from '@tabler/icons-react';
 import * as LucideIcons from 'lucide-react';
-
 import type { UserModule, ModuleCard } from '@/types/dashboard';
 import { ModuleDetailModal } from './components/module-detail-modal';
+import { SpinnerCustom } from '@/components/ui/spinner';
 
 const dockItems = [
     { title: 'Dashboard', icon: <IconHome className="h-full w-full" />, href: '/dashboard-3' },
@@ -31,29 +31,27 @@ const dockItems = [
     { title: 'Settings', icon: <IconSettings className="h-full w-full" />, href: '/settings' },
 ] as const;
 
-const getDynamicIcon = (iconName: string | null): React.ReactNode => {
-    if (!iconName) return <LucideIcons.FileText className="w-9 h-9" />;
+const parseModuleData = (raw: string | null) => {
+    if (!raw) return { iconName: 'FileText', color: 'bg-gray-500' };
 
+    try {
+        const iconMatch = raw.match(/"icon"\s*:\s*"([^"]+)"/);
+        const colorMatch = raw.match(/"color"\s*:\s*"([^"]+)"/);
+
+        const iconName = iconMatch ? iconMatch[1] : 'FileText';
+        const color = colorMatch ? colorMatch[1] : 'bg-gray-500';
+
+        return { iconName, color };
+    } catch {
+        return { iconName: 'FileText', color: 'bg-gray-500' };
+    }
+};
+
+const getDynamicIcon = (iconName: string): React.ReactNode => {
     const Icon = (LucideIcons as any)[iconName] as
         | React.ComponentType<{ className?: string }>
         | undefined;
     return Icon ? <Icon className="w-9 h-9" /> : <LucideIcons.FileText className="w-9 h-9" />;
-};
-
-const getDynamicColor = (iconName: string | null): string => {
-    if (!iconName) return 'bg-gray-500';
-    const n = iconName.toLowerCase();
-
-    if (n.includes('dollar') || n.includes('cash')) return 'bg-emerald-500';
-    if (n.includes('file') || n.includes('text')) return 'bg-blue-500';
-    if (n.includes('shopping') || n.includes('cart')) return 'bg-pink-500';
-    if (n.includes('package') || n.includes('box')) return 'bg-orange-500';
-    if (n.includes('factory') || n.includes('building')) return 'bg-purple-500';
-    if (n.includes('chart') || n.includes('bar') || n.includes('graph')) return 'bg-indigo-500';
-    if (n.includes('users') || n.includes('people') || n.includes('team')) return 'bg-cyan-500';
-    if (n.includes('settings') || n.includes('cog') || n.includes('gear')) return 'bg-gray-600';
-
-    return 'bg-gray-500';
 };
 
 export default function Dashboard() {
@@ -67,27 +65,35 @@ export default function Dashboard() {
 
     const modules: ModuleCard[] = (data?.getUserModules || [])
         .filter((m): m is UserModule => m.access === 'Y')
-        .map(
-            (m): ModuleCard => ({
-                ...m,
-                icon: getDynamicIcon(m.icon),
-                color: getDynamicColor(m.icon),
-                path: m.front_end_url || '#',
-            })
-        );
+        .map((m): ModuleCard => {
+            const { iconName, color } = parseModuleData(m.icon as any);
 
-    if (loading)
+            return {
+                ...m,
+                icon: getDynamicIcon(iconName),
+                color: color,
+                path: m.front_end_url || '#',
+            };
+        });
+
+    if (loading) {
+        return (
+            <div className="flex min-h-screen items-center justify-center bg-background">
+                <div className="flex flex-col items-center gap-4">
+                    <SpinnerCustom />
+                    <p className="text-lg font-medium text-foreground">Loading your modules...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
         return (
             <div className="flex min-h-screen items-center justify-center">
-                <p className="text-lg">Loading modules...</p>
+                <p className="text-lg text-red-500">Failed to load modules.</p>
             </div>
         );
-    if (error)
-        return (
-            <div className="flex min-h-screen items-center justify-center text-red-500">
-                <p>Failed to load modules.</p>
-            </div>
-        );
+    }
 
     return (
         <BaseLayout title="" description="">
@@ -99,7 +105,7 @@ export default function Dashboard() {
                                 key={module.module_id}
                                 onClick={() => setActiveModule(module)}
                                 className="group cursor-pointer select-none"
-                                whileHover={{ y: -3, scale: 1 }}
+                                whileHover={{ y: -3, scale: 1.02 }}
                                 whileTap={{ scale: 0.96 }}
                                 transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                             >

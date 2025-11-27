@@ -7,7 +7,16 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import { CommandSearch } from '@/components/command-search';
 import { ModeToggle } from '@/components/mode-toggle';
 import { NavUser } from './nav-user';
-import { BellIcon, Badge } from 'lucide-react';
+import {
+    Bell,
+    Sparkles,
+    ArrowRight,
+    HelpCircle,
+    FileText,
+    CheckSquare,
+    Wallet,
+    LayoutDashboard,
+} from 'lucide-react';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -21,13 +30,9 @@ import type { RootState } from '@/app/store';
 
 export function SiteHeader() {
     const [searchOpen, setSearchOpen] = React.useState(false);
-
     const user = useSelector((state: RootState) => state.auth.user);
-    const companyName = user?.companyName;
-    const divisionName = user?.divisionName;
-
-    const displayCompany = companyName || 'Loading...';
-    const displayDivision = divisionName || 'Loading...';
+    const companyName = user?.companyName || 'Company';
+    const divisionName = user?.divisionName || 'Division';
 
     React.useEffect(() => {
         const down = (e: KeyboardEvent) => {
@@ -40,87 +45,100 @@ export function SiteHeader() {
         return () => document.removeEventListener('keydown', down);
     }, []);
 
-    const NotificationMenu = ({ notificationCount = 3 }: { notificationCount?: number }) => (
+    const NotificationMenu = ({ count = 3 }: { count?: number }) => (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative h-9 w-9">
-                    <BellIcon className="h-4 w-4" />
-                    {notificationCount > 0 && (
-                        <Badge className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center p-0 text-xs font-bold">
-                            {notificationCount > 9 ? '9+' : notificationCount}
-                        </Badge>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="relative hover:bg-accent/80 transition-all"
+                >
+                    <Bell className="h-4 w-4" />
+                    {count > 0 && (
+                        <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                            {count > 9 ? '9+' : count}
+                        </span>
                     )}
-                    <span className="sr-only">Notifications</span>
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80">
-                <DropdownMenuLabel className="font-semibold">Notifications</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="flex flex-col items-start gap-1">
-                    <p className="text-sm font-medium">New message received</p>
-                    <p className="text-xs text-muted-foreground">2 minutes ago</p>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="flex flex-col items-start gap-1">
-                    <p className="text-sm font-medium">System update available</p>
-                    <p className="text-xs text-muted-foreground">1 hour ago</p>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="flex flex-col items-start gap-1">
-                    <p className="text-sm font-medium">Weekly report ready</p>
-                    <p className="text-xs text-muted-foreground">3 hours ago</p>
-                </DropdownMenuItem>
+            <DropdownMenuContent align="end" className="w-80 p-0">
+                <div className="flex items-center justify-between p-4 border-b">
+                    <DropdownMenuLabel className="text-base font-bold">
+                        Notifications
+                    </DropdownMenuLabel>
+                    <Button variant="ghost" size="sm" className="text-xs">
+                        Mark all as read
+                    </Button>
+                </div>
+                {['New approval request', 'Weekly report ready', 'System update complete'].map(
+                    (item, i) => (
+                        <DropdownMenuItem
+                            key={i}
+                            className="p-4 gap-3 hover:bg-accent/50 cursor-pointer"
+                        >
+                            <div className="w-2 h-2 rounded-full bg-primary" />
+                            <div className="flex-1">
+                                <p className="font-medium text-sm">{item}</p>
+                                <p className="text-xs text-muted-foreground">Just now</p>
+                            </div>
+                        </DropdownMenuItem>
+                    )
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                    <Link to="/settings/notifications" className="w-full">
-                        View all notifications
+                    <Link to="/notifications" className="justify-center font-medium text-primary">
+                        View all notifications <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     );
 
+    const QuickActions = () => (
+        <div className="hidden lg:flex items-center gap-1 bg-accent/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-border/50">
+            {[
+                { icon: FileText, label: 'User Logs' },
+                { icon: CheckSquare, label: 'Approve' },
+                { icon: Wallet, label: 'My Pockets' },
+                { icon: LayoutDashboard, label: 'Dashboard' },
+                { icon: HelpCircle, label: 'Help' },
+            ].map((item, i) => (
+                <Button
+                    key={i}
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs h-8 gap-1.5 hover:bg-white/20 dark:hover:bg-black/20 transition-all cursor-pointer"
+                >
+                    <item.icon className="h-3.5 w-3.5" />
+                    {item.label}
+                </Button>
+            ))}
+        </div>
+    );
+
     return (
         <>
-            <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 rounded-xl">
-                <div className="flex w-full items-center gap-4 px-3 sm:px-4 lg:px-6">
-                    <SidebarTrigger className="-ml-1 size-8" />
+            <header className="sticky top-0 z-50 flex h-16 shrink-0 items-center border-b bg-background/80 backdrop-blur-xl supports-backdrop-filter:bg-background/60 rounded-xl">
+                <div className="flex w-full items-center justify-between px-4 lg:px-6">
+                    <div className="flex items-center gap-4">
+                        <SidebarTrigger className="size-8 text-primary hover:scale-110 transition-transform" />
 
-                    <div className="flex flex-1 items-center gap-3 min-w-0">
-                        <div className="hidden sm:block flex-1 min-w-0">
-                            <div className="text-xs font-medium text-muted-foreground truncate">
-                                {displayCompany} • {displayDivision}
-                            </div>
-                            {user?.userId && (
-                                <div className="text-xs text-muted-foreground/80 truncate mt-0.5">
-                                    Logged in as{' '}
-                                    <span className="font-semibold">{user.userId}</span>
+                        <div className="hidden sm:flex items-center gap-3">
+                            <div className="flex items-center gap-2">
+                                <Sparkles className="h-5 w-5 text-primary" />
+                                <div>
+                                    <p className="text-sm font-bold text-foreground tracking-tight">
+                                        {companyName} • {divisionName}
+                                    </p>
                                 </div>
-                            )}
+                            </div>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-3">
-                        <div className="hidden lg:flex items-center gap-1">
-                            <Button variant="ghost" size="sm" className="text-xs">
-                                User Logs
-                            </Button>
-                            <Button variant="ghost" size="sm" className="text-xs font-bold">
-                                {user?.userId || 'USER'}
-                            </Button>
-                            <Button variant="ghost" size="sm" className="text-xs">
-                                Approve
-                            </Button>
-                            <Button variant="ghost" size="sm" className="text-xs">
-                                My Pockets
-                            </Button>
-                            <Button variant="ghost" size="sm" className="text-xs">
-                                Dashboard
-                            </Button>
-                            <Button variant="ghost" size="sm" className="text-xs">
-                                Help?
-                            </Button>
-                        </div>
+                    <QuickActions />
 
-                        <NotificationMenu notificationCount={3} />
+                    <div className="flex items-center gap-2">
+                        <NotificationMenu count={3} />
                         <ModeToggle />
                         <NavUser />
                     </div>
