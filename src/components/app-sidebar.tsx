@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import {
-    LayoutDashboard,
     FileText,
     DollarSign,
     CreditCard,
@@ -12,17 +11,8 @@ import {
     Building2,
     Briefcase,
     Shield,
-    Settings,
-    LayoutPanelLeft,
-    LucideLayoutPanelTop,
-    Mail,
     CheckSquare,
     MessageCircle,
-    Calendar,
-    Users,
-    LayoutTemplate,
-    AlertTriangle,
-    HelpCircle,
     LogOut,
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -41,60 +31,22 @@ import { Button } from './ui/button';
 import { toast } from 'sonner';
 import { logout } from '@/features/auth/authSlice';
 
-const demoNavGroups = [
+const PRIORITY_APPS = [
     {
-        label: 'Dashboards',
-        items: [
-            { title: 'Dashboard 1', url: '/dashboard', icon: LayoutDashboard },
-            { title: 'Dashboard 2', url: '/dashboard-2', icon: LayoutPanelLeft },
-            { title: 'Dashboard 3', url: '/dashboard-3', icon: LucideLayoutPanelTop },
-        ],
+        title: 'Tasks',
+        url: '/tasks',
+        icon: CheckSquare,
+        isPriority: true,
     },
     {
-        label: 'Apps',
-        items: [
-            { title: 'Mail', url: '/mail', icon: Mail },
-            { title: 'Tasks', url: '/tasks', icon: CheckSquare },
-            { title: 'Chat', url: '/chat', icon: MessageCircle },
-            { title: 'Calendar', url: '/calendar', icon: Calendar },
-            { title: 'Users', url: '/users', icon: Users },
-        ],
-    },
-    {
-        label: 'Pages',
-        items: [
-            { title: 'Landing', url: '/landing', target: '_blank', icon: LayoutTemplate },
-            {
-                title: 'Auth Pages',
-                url: '#',
-                icon: Shield,
-                items: [
-                    /* ...your existing */
-                ],
-            },
-            {
-                title: 'Errors',
-                url: '#',
-                icon: AlertTriangle,
-                items: [
-                    /* ...your existing */
-                ],
-            },
-            {
-                title: 'Settings',
-                url: '#',
-                icon: Settings,
-                items: [
-                    /* ...your existing */
-                ],
-            },
-            { title: 'FAQs', url: '/faqs', icon: HelpCircle },
-            { title: 'Pricing', url: '/pricing', icon: CreditCard },
-        ],
+        title: 'Chat',
+        url: '/chat',
+        icon: MessageCircle,
+        isPriority: true,
     },
 ];
 
-const getErpNavGroups = (role: string) => {
+const getErpModules = (role: string) => {
     const finance = [
         { title: 'General Ledger', url: '/modules/gl', icon: FileText },
         { title: 'Account Receivables', url: '/modules/ar', icon: DollarSign },
@@ -112,11 +64,7 @@ const getErpNavGroups = (role: string) => {
 
     const admin = role === 'admin' ? [{ title: 'System Admin', url: '/admin', icon: Shield }] : [];
 
-    return [
-        { label: 'Finance', items: finance },
-        { label: 'Operations', items: operations },
-        ...(admin.length ? [{ label: 'Administration', items: admin }] : []),
-    ];
+    return [...finance, ...operations, ...admin];
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -125,7 +73,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { user, isAuthenticated } = useSelector((state: any) => state.auth || {});
     const role = user?.role || 'employee';
 
-    const navGroups = isAuthenticated ? getErpNavGroups(role) : demoNavGroups;
+    const modules = isAuthenticated ? getErpModules(role) : [];
 
     const handleLogout = () => {
         dispatch(logout());
@@ -140,11 +88,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
                             <Link to={isAuthenticated ? '/dashboard-3' : '/'}>
-                                <div className="flex items-center">
+                                <div className="flex items-center gap-3">
                                     <img
                                         src="/eBiz_ms-logo.svg"
                                         alt="Logo"
-                                        className="h-12 w-auto dark:brightness-0 dark:invert"
+                                        className="h-10 w-auto dark:brightness-0 dark:invert"
                                     />
                                 </div>
                             </Link>
@@ -153,10 +101,42 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </SidebarMenu>
             </SidebarHeader>
 
-            <SidebarContent>
-                {navGroups.map((group) => (
-                    <NavMain key={group.label} label={group.label} items={group.items} />
-                ))}
+            <SidebarContent className="gap-6">
+                {/* PRIORITY APPS – Always at the top, highlighted */}
+                {PRIORITY_APPS.length > 0 && (
+                    <div className="px-3">
+                        <div className="mb-2 px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                            Quick Access
+                        </div>
+                        {PRIORITY_APPS.map((item) => (
+                            <SidebarMenu key={item.url}>
+                                <SidebarMenuItem>
+                                    <SidebarMenuButton
+                                        asChild
+                                        className="w-full justify-start font-medium text-foreground hover:bg-accent/80 data-[active=true]:bg-accent data-[active=true]:text-accent-foreground"
+                                    >
+                                        <Link to={item.url}>
+                                            <item.icon className="mr-3 h-5 w-5 text-primary" />
+                                            {item.title}
+                                        </Link>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            </SidebarMenu>
+                        ))}
+                    </div>
+                )}
+
+                {/* ALL MODULES – Single clean group */}
+                {modules.length > 0 && (
+                    <NavMain
+                        label="Modules"
+                        items={modules.map((mod) => ({
+                            title: mod.title,
+                            url: mod.url,
+                            icon: mod.icon,
+                        }))}
+                    />
+                )}
             </SidebarContent>
 
             <SidebarFooter>
@@ -164,10 +144,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     onClick={handleLogout}
                     variant="ghost"
                     size="sm"
-                    className="gap-2 cursor-pointer"
+                    className="w-full justify-start gap-3 text-muted-foreground hover:text-foreground"
                 >
                     <LogOut className="h-4 w-4" />
-                    <span className="hidden sm:inline">Logout</span>
+                    <span>Logout</span>
                 </Button>
             </SidebarFooter>
         </Sidebar>
