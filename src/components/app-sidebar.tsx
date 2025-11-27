@@ -144,7 +144,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                     <img
                                         src="/eBiz_ms-logo.svg"
                                         alt="Logo"
-                                        className="h-12 w-auto"
+                                        className="h-12 w-auto dark:brightness-0 dark:invert"
                                     />
                                 </div>
                             </Link>
