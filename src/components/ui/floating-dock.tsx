@@ -7,8 +7,7 @@ import {
     useMotionValue,
     useSpring,
     useTransform,
-} from 'motion/react';
-
+} from 'framer-motion';
 import { useRef, useState } from 'react';
 
 export const FloatingDock = ({
@@ -48,29 +47,15 @@ const FloatingDockMobile = ({
                             <motion.div
                                 key={item.title}
                                 initial={{ opacity: 0, y: 10 }}
-                                animate={{
-                                    opacity: 1,
-                                    y: 0,
-                                }}
-                                exit={{
-                                    opacity: 0,
-                                    y: 10,
-                                    transition: {
-                                        delay: idx * 0.05,
-                                    },
-                                }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 10, transition: { delay: idx * 0.05 } }}
                                 transition={{ delay: (items.length - 1 - idx) * 0.05 }}
                             >
                                 <a
                                     href={item.href}
-                                    key={item.title}
-                                    className="flex h-10 w-10 items-center justify-center 
-               rounded-full bg-white/80 backdrop-blur-md shadow-sm 
-               dark:bg-neutral-700/60"
+                                    className="flex h-12 w-12 items-center justify-center rounded-2xl bg-background/80 backdrop-blur-xl border border-border/50 shadow-lg"
                                 >
-                                    <div className="h-4 w-4 text-neutral-600 dark:text-neutral-200">
-                                        {item.icon}
-                                    </div>
+                                    <div className="h-6 w-6 text-foreground/80">{item.icon}</div>
                                 </a>
                             </motion.div>
                         ))}
@@ -79,9 +64,9 @@ const FloatingDockMobile = ({
             </AnimatePresence>
             <button
                 onClick={() => setOpen(!open)}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-neutral-800"
+                className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 backdrop-blur-xl border border-primary/20 shadow-lg hover:bg-primary/20 transition-all"
             >
-                <IconLayoutNavbarCollapse className="h-5 w-5 text-neutral-500 dark:text-neutral-400" />
+                <IconLayoutNavbarCollapse className="h-6 w-6 text-primary" />
             </button>
         </div>
     );
@@ -95,12 +80,13 @@ const FloatingDockDesktop = ({
     className?: string;
 }) => {
     let mouseX = useMotionValue(Infinity);
+
     return (
         <motion.div
             onMouseMove={(e) => mouseX.set(e.pageX)}
             onMouseLeave={() => mouseX.set(Infinity)}
             className={cn(
-                'mx-auto hidden h-16 items-end gap-4 rounded-2xl bg-[#e7eaec] px-4 pb-3 md:flex dark:bg-[#2b2e3d]',
+                'mx-auto hidden h-16 items-end gap-4 rounded-3xl bg-background/70 backdrop-blur-2xl border border-border/50 px-6 pb-2 shadow-2xl md:flex',
                 className
             )}
         >
@@ -117,7 +103,7 @@ function IconContainer({
     icon,
     href,
 }: {
-    mouseX: MotionValue;
+    mouseX: MotionValue<number>;
     title: string;
     icon: React.ReactNode;
     href: string;
@@ -129,33 +115,16 @@ function IconContainer({
         return val - bounds.x - bounds.width / 2;
     });
 
-    let widthTransform = useTransform(distance, [-150, 0, 150], [40, 80, 40]);
-    let heightTransform = useTransform(distance, [-150, 0, 150], [40, 80, 40]);
+    let widthTransform = useTransform(distance, [-150, 0, 150], [48, 88, 48]);
+    let heightTransform = useTransform(distance, [-150, 0, 150], [48, 88, 48]);
 
-    let widthTransformIcon = useTransform(distance, [-150, 0, 150], [20, 40, 20]);
-    let heightTransformIcon = useTransform(distance, [-150, 0, 150], [20, 40, 20]);
+    let widthTransformIcon = useTransform(distance, [-150, 0, 150], [28, 48, 28]);
+    let heightTransformIcon = useTransform(distance, [-150, 0, 150], [28, 48, 28]);
 
-    let width = useSpring(widthTransform, {
-        mass: 0.1,
-        stiffness: 150,
-        damping: 12,
-    });
-    let height = useSpring(heightTransform, {
-        mass: 0.1,
-        stiffness: 150,
-        damping: 12,
-    });
-
-    let widthIcon = useSpring(widthTransformIcon, {
-        mass: 0.1,
-        stiffness: 150,
-        damping: 12,
-    });
-    let heightIcon = useSpring(heightTransformIcon, {
-        mass: 0.1,
-        stiffness: 150,
-        damping: 12,
-    });
+    let width = useSpring(widthTransform, { stiffness: 150, damping: 15 });
+    let height = useSpring(heightTransform, { stiffness: 150, damping: 15 });
+    let widthIcon = useSpring(widthTransformIcon, { stiffness: 150, damping: 15 });
+    let heightIcon = useSpring(heightTransformIcon, { stiffness: 150, damping: 15 });
 
     const [hovered, setHovered] = useState(false);
 
@@ -166,9 +135,7 @@ function IconContainer({
                 style={{ width, height }}
                 onMouseEnter={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
-                className="relative flex aspect-square items-center justify-center 
-        rounded-full bg-white/80 backdrop-blur-md shadow-sm 
-        dark:bg-neutral-700/60"
+                className="relative flex aspect-square items-center justify-center rounded-3xl bg-background/80 backdrop-blur-xl border border-border/50 shadow-lg"
             >
                 <AnimatePresence>
                     {hovered && (
@@ -176,9 +143,7 @@ function IconContainer({
                             initial={{ opacity: 0, y: 10, x: '-50%' }}
                             animate={{ opacity: 1, y: 0, x: '-50%' }}
                             exit={{ opacity: 0, y: 2, x: '-50%' }}
-                            className="absolute -top-8 left-1/2 w-fit rounded-md border border-gray-200 bg-white/90 
-              px-2 py-0.5 text-xs whitespace-pre text-neutral-700 
-              dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-200"
+                            className="absolute -top-10 left-1/2 w-fit -translate-x-1/2 rounded-xl bg-background/95 backdrop-blur-xl border border-border/50 px-3 py-1.5 text-sm font-medium text-foreground shadow-xl"
                         >
                             {title}
                         </motion.div>
@@ -187,8 +152,7 @@ function IconContainer({
 
                 <motion.div
                     style={{ width: widthIcon, height: heightIcon }}
-                    className="flex items-center justify-center 
-          text-neutral-600 dark:text-neutral-200"
+                    className="flex items-center justify-center text-foreground/80"
                 >
                     {icon}
                 </motion.div>
