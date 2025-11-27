@@ -118,7 +118,7 @@ export function SiteHeader() {
 
     return (
         <>
-            <header className="sticky top-0 z-50 flex h-16 shrink-0 items-center border-b bg-background/80 backdrop-blur-xl supports-backdrop-filter:bg-background/60 rounded-xl">
+            <header className="sticky top-0 z-50 flex h-16 shrink-0 items-center border-b bg-background/80 backdrop-blur-xl supports-backdrop-filter:bg-background/60 rounded-lg">
                 <div className="flex w-full items-center justify-between px-4 lg:px-6">
                     <div className="flex items-center gap-4">
                         <SidebarTrigger className="size-8 text-primary hover:scale-110 transition-transform" />
